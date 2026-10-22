@@ -6,29 +6,39 @@
 <title>Gabriel's MTG Collection</title>
 <style>
 :root{--bg:#f6f4ef;--surface:#fff;--ink:#1d1b17;--muted:#6f6a5f;--line:#e2ded3;--accent:#8a5a14;--hover:#f1ede2;
---common:#6f6a5f;--uncommon:#4a7a96;--rare:#b08a1e;--mythic:#c2501a;color-scheme:light}
+--common:#6f6a5f;--uncommon:#4a7a96;--rare:#b08a1e;--mythic:#c2501a;--warn:#a4481c;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141311;--surface:#1c1b18;--ink:#ece8dd;--muted:#9d978a;--line:#2e2c27;--accent:#e0b060;--hover:#26241f;
---common:#a8a396;--uncommon:#7fb3d1;--rare:#e0c04a;--mythic:#ee7a45;color-scheme:dark}}
+--common:#a8a396;--uncommon:#7fb3d1;--rare:#e0c04a;--mythic:#ee7a45;--warn:#f0956a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#141311;--surface:#1c1b18;--ink:#ece8dd;--muted:#9d978a;--line:#2e2c27;--accent:#e0b060;--hover:#26241f;
---common:#a8a396;--uncommon:#7fb3d1;--rare:#e0c04a;--mythic:#ee7a45;color-scheme:dark}
+--common:#a8a396;--uncommon:#7fb3d1;--rare:#e0c04a;--mythic:#ee7a45;--warn:#f0956a;color-scheme:dark}
 *{box-sizing:border-box}
 html{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 16px 48px}
-.wrap{max-width:1100px;margin:0 auto}
+.wrap{max-width:1180px;margin:0 auto}
 header{padding:28px 0 16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-end}
 h1{font:600 30px/1.1 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.01em}
 .sub{color:var(--muted);font-size:13px;margin-top:6px}
 .stats{display:flex;gap:22px}
 .stat b{display:block;font:600 22px/1.1 Georgia,serif}
 .stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.controls{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5;border-bottom:1px solid var(--line)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 0;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5;border-bottom:1px solid var(--line)}
 input,select,button{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-#q{flex:1 1 220px;min-width:180px}
+#q{flex:1 1 320px;min-width:200px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
 .num{width:92px}
 button{cursor:pointer}
+#hint{min-height:20px;font-size:12.5px;margin:6px 2px 0;color:var(--muted)}
+#hint.err{color:var(--warn)}
+details.help{margin:4px 0 12px;font-size:13px}
+details.help summary{cursor:pointer;color:var(--accent);width:max-content}
+.helpbox{margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.helpbox p{margin:0 0 10px;color:var(--muted)}
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px 18px}
+.ex{display:flex;gap:8px;align-items:baseline;padding:3px 0}
+.ex button{padding:2px 7px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border-radius:6px;white-space:nowrap;color:var(--accent)}
+.ex span{color:var(--muted)}
 .tablebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:640px}
+table{border-collapse:collapse;width:100%;min-width:720px}
 th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);cursor:pointer;user-select:none;position:sticky;top:0;background:var(--surface)}
 th:hover{color:var(--ink)}
@@ -36,8 +46,25 @@ th .ar{display:inline-block;width:10px;color:var(--accent)}
 th.r,td.r{text-align:right}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:0}
-td.name{font-weight:500;cursor:default;white-space:normal;min-width:180px}
-td.set{color:var(--muted);font-size:13px}
+td.name{font-weight:500;cursor:default;white-space:normal;min-width:170px}
+td.type{color:var(--muted);font-size:13px;white-space:normal;min-width:140px}
+.ms{position:relative}
+.msb{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.msb::after{content:' ▾';color:var(--muted)}
+.msb.on{border-color:var(--accent)}
+.msp{position:absolute;top:calc(100% + 4px);left:0;min-width:190px;max-width:90vw;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:30}
+.msp[hidden]{display:none}
+.msp label{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.msp label:hover{background:var(--hover)}
+.msp input{width:16px;height:16px;padding:0;margin:0;accent-color:var(--accent)}
+.msn{font-size:12px;color:var(--muted);padding:4px 8px;white-space:normal;max-width:210px}
+.msc{width:100%;margin-top:4px;font-size:13px}
+.cost{display:inline-flex;align-items:center;gap:1px;white-space:nowrap;vertical-align:middle}
+.sym{width:17px;height:17px;display:block;flex:none}
+.cost .sep{margin:0 4px;color:var(--muted);font-size:12px}
+.pips{display:inline-flex;gap:3px;vertical-align:middle}
+.pip{width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 10px/1 system-ui,sans-serif;color:#1a1a1a;border:1px solid rgba(0,0,0,.4)}
+.pip-w{background:#f8f3d8}.pip-u{background:#8cc8ef}.pip-b{background:#6e625d;color:#fff}.pip-r{background:#ee8a6c}.pip-g{background:#7fbf8a}.pip-c{background:#cfcfcf}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:13px}
 .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
 .common{color:var(--common)}.uncommon{color:var(--uncommon)}.rare{color:var(--rare)}.mythic{color:var(--mythic)}
@@ -57,7 +84,7 @@ td.set{color:var(--muted);font-size:13px}
 <header>
   <div>
     <h1>Gabriel's MTG Collection</h1>
-    <div class="sub">Hover a card name to preview it. Click column headers to sort.</div>
+    <div class="sub">Hover a card name to preview it. Click column headers to sort. Search understands Scryfall syntax.</div>
   </div>
   <div class="stats">
     <div class="stat"><b id="sCards">–</b><span>Cards</span></div>
@@ -67,14 +94,22 @@ td.set{color:var(--muted);font-size:13px}
 </header>
 
 <div class="controls">
-  <input id="q" type="search" placeholder="Search card or set…" aria-label="Search">
-  <select id="fRarity" aria-label="Rarity"><option value="">All rarities</option></select>
-  <select id="fFoil" aria-label="Foil"><option value="">Foil &amp; non-foil</option><option value="foil">Foil only</option><option value="normal">Non-foil only</option></select>
-  <select id="fSet" aria-label="Set"><option value="">All sets</option></select>
+  <input id="q" type="search" placeholder='Search like Scryfall: t:goblin o:"draw a card" c:r' aria-label="Search" autocomplete="off" spellcheck="false">
+  <div class="ms" id="msRarity"><button type="button" class="msb">Rarity</button><div class="msp" hidden></div></div>
+  <div class="ms" id="msFoil"><button type="button" class="msb">Foil</button><div class="msp" hidden></div></div>
+  <div class="ms" id="msColor"><button type="button" class="msb">Color</button><div class="msp" hidden></div></div>
   <input id="pMin" class="num" type="number" min="0" step="0.01" placeholder="Min $" aria-label="Minimum price">
   <input id="pMax" class="num" type="number" min="0" step="0.01" placeholder="Max $" aria-label="Maximum price">
   <button id="reset" type="button">Reset</button>
 </div>
+<div id="hint"></div>
+<details class="help">
+  <summary>Search syntax help</summary>
+  <div class="helpbox">
+    <p>Click an example to try it. Terms are combined with AND; use <b>or</b>, <b>-</b> to exclude, and <b>( )</b> to group. Bare words search the card name. Text fields also accept <b>/regex/</b>, and <b>~</b> in rules text stands for the card's own name.</p>
+    <div class="exgrid" id="examples"></div>
+  </div>
+</details>
 
 <div class="tablebox">
 <table>
@@ -92,16 +127,243 @@ td.set{color:var(--muted);font-size:13px}
 <script>
 const RAW = [["Archetype of Finality","BNG","Born of the Gods",58,0,"uncommon",1,"f326b9c5-063b-4c53-a696-11cd89fc88d8",1.96],["Abyssal Gorestalker","LCI","The Lost Caverns of Ixalan",87,0,"uncommon",1,"a559f77f-1f10-475b-9361-7f297d50f254",0.23],["Monoist Circuit-Feeder","EOE","Edge of Eternities",110,0,"uncommon",1,"957ae7aa-98d6-402a-9b20-e3e5b7e8dfe3",0.15],["Dark Withering","DMR","Dominaria Remastered",79,0,"uncommon",1,"6996d612-28a5-4515-baba-9aad65bf4b28",0.24],["Vengeful Vampire","DKA","Dark Ascension",78,0,"uncommon",1,"d03c64a7-37d2-4d8f-bd7a-9435bc2f4101",0.25],["Wick's Patrol","BLB","Bloomburrow",121,0,"uncommon",1,"5fa0c53d-fe7b-4b8b-ad81-7967ca318ff7",0.14],["Enslave","TSR","Time Spiral Remastered",113,0,"uncommon",1,"a00440fc-e3e1-4a1c-b32b-f7946a76cd62",0.15],["Harrowing Journey","DKA","Dark Ascension",67,0,"uncommon",1,"9cf96a6c-8481-4954-b149-7153b80480be",0.15],["Kemuri-Onna","SOK","Saviors of Kamigawa",76,0,"uncommon",1,"4eed13fd-68be-4bc3-af6a-d88baaf9c98d",0.24],["Sengir Connoisseur","DMU","Dominaria United",104,0,"uncommon",1,"7c9231f0-7733-46d9-b9c6-c6c5b7fe65dd",0.18],["Blood Host","M15","Magic 2015",87,0,"uncommon",1,"1454a83d-f018-446c-89fb-21460924e589",0.09],["Rescue from the Underworld","THS","Theros",102,0,"uncommon",1,"2e46aa9c-7a29-4eb4-bc44-a201c22824d2",0.24],["Keepsake Gorgon","CN2","Conspiracy: Take the Crown",141,0,"uncommon",1,"aa8d2ece-9639-4384-8284-27a1b0475228",0.08],["Veilborn Ghoul","M13","Magic 2013",114,0,"uncommon",1,"d3f49232-2853-427f-8c20-322e09a3ccde",0.15],["Dreaded Bat-Cloud","HOB","The Hobbit",66,0,"uncommon",1,"67d52db5-597e-46d5-af39-c3a2de107d30",0.13],["Farbog Boneflinger","CN2","Conspiracy: Take the Crown",134,0,"uncommon",1,"3185eeac-39ae-4e6e-bfdd-4b8edd984af1",0.08],["Perfect Intimidation","ECL","Lorwyn Eclipsed",115,0,"uncommon",1,"ff05b7f4-e0d0-4304-99b3-66ac804129fe",0.15],["Nightmare Sower","ECL","Lorwyn Eclipsed",114,0,"uncommon",1,"35dfa0f9-faf3-4a85-b02d-0c5830783511",0.29],["Billowing Shriekmass","FDN","Foundations",56,0,"uncommon",1,"7b3587a9-0667-4d53-807b-c437bcb1d7b3",0.16],["Revenge of the Rats","FDN","Foundations",67,0,"uncommon",1,"1f463c55-39a0-4f2f-aae3-0c5540bde5b7",0.3],["Dark Revenant","RTR","Return to Ravnica",61,0,"uncommon",1,"2167cc6d-ddb5-4f13-8905-a0c5123b852a",0.12],["Sever the Bloodline","INR","Innistrad Remastered",130,0,"uncommon",1,"a2d4152d-c128-453c-86f5-f2ebcfd48b98",0.2],["Haunted Dead","INR","Innistrad Remastered",116,0,"uncommon",1,"49fae417-c4f4-478c-86c4-83094306b8d4",0.21],["Arcbound Condor","MH3","Modern Horizons 3",81,0,"uncommon",1,"e7995b44-7932-4d28-9a4c-a32ba35c60d7",0.18],["Diabolic Tutor","CMA","Commander Anthology",54,0,"uncommon",1,"d650dd8c-edd8-44e4-ae95-aaaf84557a72",2.34],["Vampire Outcasts","MM2","Modern Masters 2015",102,0,"uncommon",1,"32c1d966-b3c5-4480-be58-054a88141e44",0.07],["Skemfar Shadowsage","KHM","Kaldheim",110,0,"uncommon",1,"c204130f-0483-49ed-8512-03a74894702e",0.34],["Caustic Rain","GPT","Guildpact",44,0,"uncommon",1,"71fde21d-ce4e-41b7-97d5-c982f90b84a0",0.17],["Auntie's Snitch","MMA","Modern Masters",72,0,"uncommon",1,"58ae897d-bbf9-47fe-a4d1-788cdf5c5de3",0.12],["Wail of War","TDM","Tarkir: Dragonstorm",98,0,"uncommon",1,"7e9430dd-f583-400d-808a-64e2b5fa54f1",0.19],["Mindless Conscription","MH3","Modern Horizons 3",101,0,"uncommon",1,"1af5b195-101a-4265-98a7-522a968cf218",0.2],["Stromkirk Bloodthief","FDN","Foundations",185,0,"uncommon",1,"485d6a5a-2054-47d5-91b8-71ce308ed4dc",0.24],["Tribute to Hunger","FDN","Foundations",614,0,"uncommon",1,"11f1b897-bb7d-4217-97a7-c89f2453c8fa",0.1],["Knight of Infamy","M13","Magic 2013",96,0,"uncommon",1,"9e339853-5b6b-47b7-8d88-e9d3befb803f",0.2],["Wakedancer","EMA","Eternal Masters",116,0,"common",1,"e85a5833-042b-4b13-8151-f9e4bcf8e810",0.09],["Wall of Bone","GVL","Duel Decks Anthology: Garruk vs. Liliana",41,0,"uncommon",1,"45025791-a94a-4046-8297-3b7a2019e4a3",0.29],["Gruesome Encore","MBS","Mirrodin Besieged",44,0,"uncommon",1,"3f7f31fb-af96-4c8c-80fa-219ebd7c3d4d",0.19],["Seeker's Folly","FDN","Foundations",69,0,"uncommon",1,"bc359da6-8b7f-45ec-b530-ce159fc35953",0.12],["Scrounge for Eternity","EOE","Edge of Eternities",114,0,"uncommon",1,"baeff907-017e-4dee-aae1-19dfaab309de",0.24],["Retched Wretch","ECL","Lorwyn Eclipsed",117,0,"uncommon",1,"c7a4d7f1-976a-4a28-97a9-ff089a241c9d",0.13],["Mark of the Oni","BOK","Betrayers of Kamigawa",73,0,"uncommon",1,"632679e5-7368-4660-a765-07be196c3c35",0.27],["Hero's Downfall","FDN","Foundations",175,0,"uncommon",1,"ad2c01d9-8f54-46c0-9dc9-d4d4764ce1c9",0.29],["Nadier's Nightblade","BLC","Bloomburrow Commander",184,0,"uncommon",1,"b533e358-3b30-4719-a2a3-13fb9ea817c6",0.37],["Down, Down to Goblin-town","HOB","The Hobbit",65,0,"uncommon",1,"b72e193c-e030-4936-9b79-c636eff750e1",0.21],["Faller's Faithful","EOE","Edge of Eternities",100,0,"uncommon",1,"cbb1b46f-72e0-4c2f-8012-74529bd29a0d",0.2],["Screeching Bat // Stalking Vampire","ISD","Innistrad",114,0,"uncommon",1,"88db324f-11f1-43d3-a897-f4e3caf8d642",0.21],["Gateway Shade","GTC","Gatecrash",65,0,"uncommon",1,"aa33fc15-3a4f-48bc-be7c-fdec1cb49c10",0.23],["Faceless Devourer","TSR","Time Spiral Remastered",115,0,"uncommon",1,"c49d6139-fc0c-41db-be08-dfa87c685092",0.25],["Cower in Fear","MM3","Modern Masters 2017",62,0,"common",1,"08e3cc81-2c08-4281-aa16-4c22f141f31d",0.15],["Painsmith","2XM","Double Masters",102,0,"uncommon",1,"79301fd4-2f00-4ff5-993f-a6af2440064b",0.16],["Osseous Sticktwister","DSK","Duskmourn: House of Horror",112,0,"uncommon",1,"4f43473e-1302-4543-b331-1a86cfbc3ced",0.27],["Consume Spirit","M12","Magic 2012",88,0,"uncommon",1,"ef144439-fc8e-4844-8ebb-3e36e05ac9a0",0.19],["Onyx Mage","M12","Magic 2012",103,0,"uncommon",1,"eabd38e6-1e59-42d2-bd1a-555c77cf6747",0.23],["Asylum Visitor","INR","Innistrad Remastered",96,0,"uncommon",1,"02046824-6c48-40bb-9f0b-4fd280c6ed85",0.36],["Foul Play","MID","Innistrad: Midnight Hunt",101,0,"uncommon",1,"87e4b75c-e993-4983-8933-977be314bba6",0.14],["Doom Blade","E02","Explorers of Ixalan",18,0,"uncommon",1,"7e89b4da-a095-4790-b1b7-2369fa221aa4",0.22],["Heartless Act","CMM","Commander Masters",166,0,"uncommon",1,"a11dea2a-fe20-4e1b-9e1e-8759e0950f0a",0.16],["Creakwood Safewright","ECL","Lorwyn Eclipsed",96,0,"uncommon",1,"3bcc24cf-776a-4182-bf77-a611ad90b28f",0.16],["Marionette Apprentice","MH3","Modern Horizons 3",100,0,"uncommon",1,"d16f8670-f038-400a-83e7-a53a7f8c47ac",2.3],["Gorbag of Minas Morgul","LTR","The Lord of the Rings: Tales of Middle-earth",86,0,"uncommon",1,"58aafdb6-1c8c-4fc4-a52e-3e601be7fb0c",0.24],["Ghoulish Procession","INR","Innistrad Remastered",110,0,"uncommon",1,"c178227f-3b66-45f7-9838-dff70f1f2003",0.37],["Thrill-Kill Assassin","GK2","RNA Guild Kit",54,0,"uncommon",1,"4feec838-0801-4b8a-8c76-a2cd52311cbd",0.21],["Ultimate Price","DTK","Dragons of Tarkir",124,0,"uncommon",1,"b41f7cf3-bd76-4184-b694-f565aa5cf3a4",0.06],["Multiply by Zero","FRA","Reality Fracture",58,0,"uncommon",1,"90d684a4-9639-4792-8760-2011a7a85370",0.31],["Desolation Prowler","HOB","The Hobbit",64,0,"uncommon",1,"63c87009-ff1b-44b9-88b1-e26219094c67",0.17],["Skirsdag Flayer","DKA","Dark Ascension",74,0,"uncommon",1,"274976b0-2bb5-46e6-b62e-b50d80a77e28",0.19],["Bloodthorn Flail","LCI","The Lost Caverns of Ixalan",93,0,"uncommon",1,"db38babd-57e8-4e59-9701-11a0682baa77",0.23],["Thrull Parasite","GTC","Gatecrash",81,0,"uncommon",1,"c38dfb08-ab41-4759-9967-b5a25f18518a",0.38],["Vampiric Rites","WOT","Wilds of Eldraine: Enchanting Tales",37,0,"uncommon",1,"6854dc06-4845-4201-958b-2fdad3f7b64a",0.33],["Indulgent Aristocrat","INR","Innistrad Remastered",118,0,"uncommon",1,"07015524-874f-4856-a5c1-3148bd126886",0.33],["Dreadmalkin","RVR","Ravnica Remastered",75,0,"uncommon",1,"9dc48d40-630b-4699-9cc9-5035313f538b",0.23],["Gnarlroot Trapper","ORI","Magic Origins",100,0,"uncommon",1,"e05572ba-3a26-41f5-96c1-960ec9367178",0.32],["Illness in the Ranks","GTC","Gatecrash",69,0,"uncommon",1,"989a68c1-3b76-4c2d-9db3-23c45be3f9ff",0.21],["Deathmark","MM2","Modern Masters 2015",77,0,"uncommon",1,"ad3ef45f-c82c-4490-b353-b0b5b572f403",0.11],["Nighthowl Pursuer","HOB","The Hobbit",78,0,"uncommon",1,"d3cbe830-7e95-4019-89c4-cfb36bcf00f8",0.26],["Piranha Marsh","ZEN","Zendikar",222,0,"common",1,"ea077cff-b5c9-4a40-8e66-8810c37be5cb",0.3],["Vivid Marsh","C17","Commander 2017",292,0,"uncommon",1,"b71b3df3-e188-45bb-8dc8-53fd4d527735",0.54],["Corrupt","DVD","Duel Decks Anthology: Divine vs. Demonic",55,0,"uncommon",2,"433d0737-bb61-4aa0-98e8-1bd2d86f03fd",0.19],["Reaper of Sheoldred","NPH","New Phyrexia",72,0,"uncommon",2,"a300a645-aec6-4cda-8c11-1e8a6af056ff",0.87],["Evernight Shade","C14","Commander 2014",144,0,"uncommon",2,"96ab331f-41eb-40af-b02d-1df0c5760e85",0.26],["Triskaidekaphobia","INR","Innistrad Remastered",136,0,"uncommon",3,"3354807e-bea0-4903-8010-06618af4c700",0.28],["Barter in Blood","CMA","Commander Anthology",48,0,"uncommon",2,"37d5b6d7-1b3f-4586-8969-8c5d7457b75f",0.27],["Duskmantle Prowler","M13","Magic 2013",91,0,"uncommon",3,"bcb031da-d41a-496a-b78e-0773f6504303",0.15],["Gríma Wormtongue","LTR","The Lord of the Rings: Tales of Middle-earth",88,0,"uncommon",3,"8e3bd86b-e8ca-4885-a823-78fb967e6caf",0.23],["Vampire Nighthawk","FDN","Foundations",186,0,"uncommon",4,"0a1934ab-3171-4fc6-8033-ad998899ba73",0.25],["Demonic Taskmaster","INR","Innistrad Remastered",104,0,"uncommon",2,"af33e187-b535-49ac-90fa-17a5ed72d920",0.26],["Whispering Specter","NPH","New Phyrexia",77,0,"uncommon",4,"bcb1b486-e336-4e88-b635-b6ff18cb4841",1.96],["Ichor Rats","ONC","Phyrexia: All Will Be One Commander",93,0,"uncommon",3,"387e4be7-7e3d-4623-afe6-229f8a9bacd4",4.06],["Undercity Informer","GTC","Gatecrash",82,0,"uncommon",3,"822d0f73-cfb0-41d9-b4eb-09c605112a13",0.28],["Gnashing of Teeth","HOB","The Hobbit",69,0,"uncommon",2,"5d485d70-c7b9-40a4-9089-5e7f1c2b9213",0.14],["Gollum, Patient Plotter","LTR","The Lord of the Rings: Tales of Middle-earth",84,0,"uncommon",2,"4ddda7d4-0226-404f-8418-f1f5720dcef8",0.22],["Reassembling Skeleton","TDC","Tarkir: Dragonstorm Commander",195,0,"uncommon",3,"4d431445-d7db-4ce1-b422-41494d9be1b4",0.27],["Dying Wish","GTC","Gatecrash",64,0,"uncommon",2,"b46e83d3-c66d-42fb-8435-b6c448db01ae",0.21],["Tenacious Dead","BBD","Battlebond",163,0,"uncommon",2,"7d88901c-3fa8-4b73-a584-3efa118338f1",0.15],["Deadly Allure","INR","Innistrad Remastered",103,0,"uncommon",5,"7f07cf72-7f2e-44cc-8966-93463974220a",0.21],["Killing Glare","GTC","Gatecrash",70,0,"uncommon",2,"f7a4d87d-b844-4f20-8b14-4fd32c53dea5",0.14],["Requiting Hex","ECL","Lorwyn Eclipsed",116,0,"uncommon",2,"f21b0fb7-91b6-403f-a81a-562665961276",0.71],["Ghalta the Immovable","FRA","Reality Fracture",197,0,"uncommon",1,"a9f3aa55-908f-42db-8135-4201433df850",0.33],["Boonweaver Giant","M15","Magic 2015",5,0,"uncommon",1,"85003365-7c5f-4283-995d-e466deef444b",0.19],["Kithkeeper","ECL","Lorwyn Eclipsed",23,0,"uncommon",1,"ef29eff7-72be-46e6-9275-0f0a44d29233",0.09],["Goldnight Redeemer","DDQ","Duel Decks: Blessed vs. Cursed",13,0,"uncommon",1,"9396d218-35e4-4457-9f3a-18bae368b526",0.35],["Fear of Abduction","DSK","Duskmourn: House of Horror",9,0,"uncommon",1,"fc9374be-5e4b-4c23-8b6e-94c03d4f5ef1",0.14],["Urbis Protector","CLU","Ravnica: Clue Edition",79,0,"uncommon",1,"8771abc9-e1f2-4d4f-8492-3209866cdc05",0.09],["Tale of Tinúviel","LTR","The Lord of the Rings: Tales of Middle-earth",34,0,"uncommon",1,"9ae65f96-7bfd-4390-88bf-764c26bf4668",0.22],["Ajani Fells the Godsire","MH3","Modern Horizons 3",19,0,"uncommon",1,"1d918133-d4e2-4674-a3cb-58edef1c6758",0.22],["Commander's Authority","AVR","Avacyn Restored",13,0,"uncommon",1,"08ef4383-11e7-4426-a04a-058570f46e47",0.28],["Claws Out","FDN","Foundations",6,0,"uncommon",1,"4396049c-b976-4b7f-8ecd-564e24ebd631",0.26],["Guardian of the Gateless","CN2","Conspiracy: Take the Crown",89,0,"uncommon",1,"df091618-cef7-469b-aff5-27cad917616f",0.28],["Malamet War Scribe","LCI","The Lost Caverns of Ixalan",21,0,"uncommon",1,"b92a6ba0-cea0-4084-92f1-2bd60ea25fb0",0.17],["Slayer of the Wicked","INR","Innistrad Remastered",39,0,"uncommon",1,"ca4537d3-c481-49ac-826c-b51c2e9b1fcf",0.09],["Azorius Justiciar","CLU","Ravnica: Clue Edition",55,0,"uncommon",1,"1628e808-f0d7-4225-8020-d9cbd14c510e",0.18],["Mausoleum Guard","INR","Innistrad Remastered",33,0,"uncommon",1,"849bea7e-74e5-4310-be5a-d517d7b19be6",0.23],["Rally the Monastery","TDM","Tarkir: Dragonstorm",19,0,"uncommon",1,"b56e0037-8143-4c13-83e1-0c3f44e685ea",0.24],["Heliod's Emissary","THS","Theros",18,0,"uncommon",1,"49663acb-582e-495a-b45e-5fc5f4949f22",0.19],["Faramir, Field Commander","LTR","The Lord of the Rings: Tales of Middle-earth",303,0,"uncommon",1,"008b953a-da2b-4c30-9424-6d6e3e938251",0.2],["Angelic Exaltation","RVR","Ravnica Remastered",2,0,"uncommon",1,"e03dac86-63a0-4957-95bb-1b228003bc13",0.22],["Congregate","DMR","Dominaria Remastered",4,0,"uncommon",1,"89396f5e-5bc3-4c8a-976b-2cb2946eb35d",0.24],["Thoughtweft Imbuer","ECL","Lorwyn Eclipsed",38,0,"uncommon",1,"7e585a6c-2d95-450e-98cb-8794d7d8ecca",0.17],["Sunbond","BNG","Born of the Gods",28,0,"uncommon",1,"9f14bbff-8a3c-4aa0-a5aa-0dd6cb23b2a3",0.48],["Crush Contraband","NEC","Neon Dynasty Commander",82,0,"uncommon",1,"08c5cdbe-2142-4ddc-b9b5-35ca60eb9970",0.26],["Holy Mantle","GTC","Gatecrash",17,0,"uncommon",1,"95567596-c5b1-426f-bc2c-43306f7221b0",0.35],["Builder's Blessing","AVR","Avacyn Restored",8,0,"uncommon",1,"2ad27af1-b482-40d5-9dbb-11201ffa0410",0.27],["Goldnight Commander","TDC","Tarkir: Dragonstorm Commander",117,0,"uncommon",1,"854ee15f-bf36-4b80-9717-6e6f02da790e",0.36],["Bill the Pony","LTR","The Lord of the Rings: Tales of Middle-earth",3,0,"uncommon",1,"9ac68519-ed7f-4f38-9549-c02975f88eed",0.2],["Vigil for the Lost","SOM","Scars of Mirrodin",26,0,"uncommon",1,"4a87b48b-2ae9-4753-8719-62411f94ca87",0.11],["Angelic Benediction","DVD","Duel Decks Anthology: Divine vs. Demonic",19,0,"uncommon",1,"a2a782a3-cc30-47c2-aab3-18abcda3df0a",0.51],["Hexgold Hoverwings","ONE","Phyrexia: All Will Be One",14,0,"uncommon",1,"c498dbf9-c68c-400c-9349-c3c3fc8efcae",0.23],["Angelic Accord","IMA","Iconic Masters",7,0,"uncommon",1,"349e8190-15fd-44ed-a821-9a5f3615d2d9",2.12],["Gavony Ironwright","DKA","Dark Ascension",9,0,"uncommon",1,"05d8de75-b169-4426-94a4-b19cdfdffd89",0.15],["Solitary Sanctuary","WOE","Wilds of Eldraine",30,0,"uncommon",1,"d155693c-def0-4290-b662-ab9932e07fe5",0.3],["Knight of Doves","WOE","Wilds of Eldraine",19,0,"uncommon",1,"b4f33617-ad19-4d42-ab94-6f21a7fb3dd4",0.22],["Steelform Sliver","M14","Magic 2014",38,0,"uncommon",1,"c15d6329-ffb1-43fd-8558-60c8315f5b91",0.31],["Emancipation Angel","UMA","Ultimate Masters",15,0,"uncommon",1,"189e0728-94e3-43af-a341-d2bbb33b6b32",0.21],["Midnight Haunting","ONC","Phyrexia: All Will Be One Commander",82,0,"uncommon",1,"eddc09d1-63de-4791-b654-31b354032c54",0.36],["Rally the Peasants","INR","Innistrad Remastered",37,0,"uncommon",1,"9387f821-10ec-4698-9697-ad37084b4861",0.22],["Riftmarked Knight","TSR","Time Spiral Remastered",38,0,"uncommon",1,"20c4cb76-c895-4862-8099-d306b1bb06e9",0.13],["Timely Reinforcements","M12","Magic 2012",40,0,"uncommon",1,"6ae4669c-e526-4c24-9c25-38cb5c5ef59b",0.25],["Join Forces","DMU","Dominaria United",21,0,"uncommon",1,"e4dce5e7-c864-4239-bab7-af6a3adcb731",0.14],["Essence Reliquary","MH3","Modern Horizons 3",24,0,"uncommon",1,"e65f4ae3-6b21-4827-9851-8a53628e254f",0.21],["Battle Mastery","M15","Magic 2015",4,0,"uncommon",1,"7a8313a1-af64-4ffb-9110-e70d297b9343",0.31],["Banisher Priest","MOC","March of the Machine Commander",173,0,"uncommon",1,"0e518f9e-d74d-4a6f-8fde-5e3ec5834e63",0.23],["Dauntless Veteran","FDN","Foundations",8,0,"uncommon",1,"7a136f26-ac66-407f-b389-357222d2c4a2",0.18],["Devouring Light","MOC","March of the Machine Commander",180,0,"uncommon",1,"6a6676da-82d7-4690-ad83-6fda7081517c",0.27],["Meanders Guide","ECL","Lorwyn Eclipsed",25,0,"uncommon",1,"8c41a0ad-138e-4eef-8f7f-35017e3b086f",0.14],["Paraselene","ISD","Innistrad",26,0,"uncommon",1,"406380ab-2695-4084-99a5-f5560304f8cb",0.24],["Sunseed Nurturer","ALA","Shards of Alara",29,0,"uncommon",1,"9d44447e-09d1-450f-907f-42f79b004fe7",0.18],["Abiding Grace","H2R","Modern Horizons 2 Timeshifts",1,0,"uncommon",1,"1eaccb5a-76f9-4250-9bf0-0baa2d905868",0.29],["The Mountain-king's Return","HOB","The Hobbit",22,0,"uncommon",1,"68f4893d-e9a5-4f89-ade3-9ab78a834ad5",0.2],["Hop to It","SOA","Secrets of Strixhaven Mystical Archive",6,0,"uncommon",1,"16fabbbf-e35b-468c-9aea-09aa6a388dee",0.29],["Mentor of the Meek","INR","Innistrad Remastered",34,0,"uncommon",1,"280ca0f4-be07-452a-bbc0-c25570f14008",0.33],["Ardenn, Intrepid Archaeologist","CMR","Commander Legends",10,0,"uncommon",1,"728b802c-969b-4865-b7a0-871c585d097a",3.47],["Hold the Gates","GTC","Gatecrash",16,0,"uncommon",1,"48fd52d0-0e41-48d5-b96f-4c6409788c18",0.19],["Spectral Shepherd","INR","Innistrad Remastered",41,0,"uncommon",1,"a44cc0d0-5fdf-4090-bedd-a64069831df4",0.17],["Proud Pack-Rhino","MH3","Modern Horizons 3",41,0,"uncommon",1,"0821e622-88b8-4b82-a696-954da1dde915",0.22],["Lingering Souls","INR","Innistrad Remastered",30,0,"uncommon",1,"09cd56b2-1987-40c2-a436-5f3cbc564f1c",0.29],["Bat Colony","LCI","The Lost Caverns of Ixalan",5,0,"uncommon",1,"1c02134c-ec9f-4090-820e-8ba7ae4a8c2b",0.26],["Tethmos High Priest","UMA","Ultimate Masters",40,0,"common",1,"51baeea2-a922-4e98-8253-f395546c30c8",0.23],["Myrsmith","CMM","Commander Masters",44,0,"common",1,"78ea3e84-2d78-489f-875a-48e58c956451",0.23],["Vanguard of the Rose","LCI","The Lost Caverns of Ixalan",42,0,"uncommon",1,"0200c504-9137-4bc2-9cd4-eaf0643a2855",0.08],["Knight of Glory","M13","Magic 2013",21,0,"uncommon",1,"1646cb67-e0ac-4f2d-af21-618ff3613d69",0.31],["Clay-Fired Bricks // Cosmium Kiln","LCI","The Lost Caverns of Ixalan",6,0,"uncommon",1,"8aece300-656b-4e0d-a45f-aa7feaff0a4e",0.19],["Distinguished Conjurer","MH3","Modern Horizons 3",264,0,"uncommon",1,"5ed5bc3d-4056-40b0-a47a-2841692614b3",0.23],["Lost to Legend","LTR","The Lord of the Rings: Tales of Middle-earth",22,0,"uncommon",1,"c4e40481-aeaa-4b3d-a020-e9b6d7c11992",0.22],["Samwise the Stouthearted","LTR","The Lord of the Rings: Tales of Middle-earth",306,0,"uncommon",1,"44c6a273-9307-432a-96f5-3e536da70f95",0.21],["Sunstar Expansionist","EOE","Edge of Eternities",41,0,"uncommon",1,"93b0e6e5-9fb6-4342-9322-1a4cc09a7a76",0.19],["Hookblade","ACR","Assassin's Creed",6,0,"uncommon",1,"e17eca56-f658-410f-b505-8cbc87d4f253",0.26],["Samwise the Stouthearted","LTR","The Lord of the Rings: Tales of Middle-earth",28,0,"uncommon",1,"214c270e-29ca-4d69-bea6-9252ae7707ad",0.27],["Iron Hills Blacksmith","HOB","The Hobbit",16,0,"uncommon",1,"370e09c2-36c5-4662-8350-1db798afad3e",0.24],["Prophesied End","FRA","Reality Fracture",17,0,"uncommon",1,"1f95399a-9766-4f3d-aa6a-ece55e0530d9",0.3],["Bark of Doran","ECL","Lorwyn Eclipsed",6,0,"uncommon",1,"98210276-1b85-4db5-8ab4-ecb08f5d2ee2",0.2],["Sunhome Stalwart","CLU","Ravnica: Clue Edition",73,0,"uncommon",1,"3eb6a3ab-29eb-4c9a-995b-04de1c0dd4c9",0.17],["Burdened Stoneback","ECL","Lorwyn Eclipsed",8,0,"uncommon",1,"3278b8d0-3d2b-4d3d-bbf1-fd9b714b53ed",0.11],["Sun-Blessed Healer","FDN","Foundations",25,0,"uncommon",1,"323d029e-9a88-4188-b3a4-38ef32cffc9f",0.23],["Guardian of the Great Door","LCI","The Lost Caverns of Ixalan",16,0,"uncommon",1,"a86f3cb2-7822-4c19-bd84-cea177e5b6e9",0.14],["To Arms!","RVR","Ravnica Remastered",30,0,"uncommon",1,"ddc5e5fb-d1e2-4384-b630-ae8cb143d558",0.27],["Intangible Virtue","INR","Innistrad Remastered",29,0,"uncommon",1,"716d82a1-fb5d-4607-b1fa-e8e9edd4dd77",0.3],["Templar Knight","ACR","Assassin's Creed",10,0,"uncommon",1,"3d5a1bec-9128-4c5e-98c3-317424f892d1",1.65],["Niblis of the Urn","INR","Innistrad Remastered",35,0,"uncommon",1,"1ffd406d-92d3-47f1-8887-853958fd464e",0.26],["Perimeter Captain","WWK","Worldwake",16,0,"uncommon",1,"4e532309-5cf9-4d12-b673-f9baad30b800",1.52],["Lupinflower Village","BLB","Bloomburrow",256,0,"uncommon",1,"8ab9d56f-9178-4ec9-a5f6-b934f50d8d9d",0.28],["Deafening Silence","ELD","Throne of Eldraine",10,0,"uncommon",1,"6072d9b0-d3c7-46f4-bd24-095bb13c4dea",1.98],["Kinsbaile Aspirant","ECL","Lorwyn Eclipsed",21,0,"uncommon",1,"56dfdab1-ea3f-4663-a855-a9e72505f85e",0.14],["Honor","EOE","Edge of Eternities",21,0,"uncommon",1,"d0b4e925-1d59-41a1-bc06-9982695d778f",0.28],["Reroute Systems","EOE","Edge of Eternities",31,0,"uncommon",1,"3bbdba38-2b99-4226-98e3-6d2580345d6d",0.18],["Hail of Arrows","CN2","Conspiracy: Take the Crown",90,0,"uncommon",1,"797b0779-8a2c-4f24-9447-f039ac9d6aa5",0.13],["Ethereal Armor","DSK","Duskmourn: House of Horror",7,0,"uncommon",1,"fd0e8a82-0201-483e-a976-5f29764b35a4",0.32],["Graduation Day","SOS","Secrets of Strixhaven",16,0,"uncommon",1,"db1cea01-123e-4b23-8b98-f94cabce3912",0.23],["Rain of Blades","M13","Magic 2013",28,0,"uncommon",1,"f3bd6ca4-c4ed-41c3-834c-23e0c1741b72",0.06],["Swords to Plowshares","FRC","Reality Fracture Commander",37,0,"uncommon",1,"f7e12477-d59f-442b-a678-1be746d0b7be",1.36],["Joust Through","FDN","Foundations",19,0,"uncommon",1,"846adb38-f9bb-4fed-b8ed-36ec7885f989",0.2],["Flourishing Fox","IKO","Ikoria: Lair of Behemoths",13,0,"uncommon",1,"78b81339-746d-4f71-9943-01c0f6a5683a",0.22],["Ruin-Lurker Bat","LCI","The Lost Caverns of Ixalan",33,0,"uncommon",1,"d6bedf13-c2bc-4e5d-aba3-3c0d5495a9bb",0.37],["Swooping Lookout","ONE","Phyrexia: All Will Be One",35,0,"uncommon",1,"b62c740d-260d-4dfa-b6b3-9a1527538f89",0.32],["Subjugator Angel","INR","Innistrad Remastered",43,0,"uncommon",2,"bb89585f-0c68-42e6-8115-07d5752f6c1c",0.38],["Serra Angel","FDN","Foundations",147,0,"uncommon",2,"3cee9303-9d65-45a2-93d4-ef4aba59141b",0.14],["Prized Elephant","M13","Magic 2013",27,0,"uncommon",2,"01597ede-94e7-44a4-93c2-7fd1db11e92a",0.21],["Healer of the Pride","M13","Magic 2013",19,0,"uncommon",3,"35716e37-1bb2-41e2-bb55-e65126b01ce3",0.34],["Crusader of Odric","INR","Innistrad Remastered",18,0,"common",4,"d6ae6566-3df8-4e09-b487-f0362622ca04",0.24],["Oblivion Ring","MM2","Modern Masters 2015",29,0,"uncommon",2,"bff31eba-8ab3-403e-8d82-37a18b279bec",0.29],["Banishing Light","FDN","Foundations",138,0,"common",2,"e38dc3b3-1629-491b-8afd-0e7a9a857713",0.14],["Righteous Charge","GTC","Gatecrash",23,0,"uncommon",2,"f52cb325-4f16-4cf3-9999-feafe0fde8c2",0.06],["Slith Ascendant","CMR","Commander Legends",49,0,"common",2,"b90157f8-ba3c-479e-80d8-8f9e042c540c",0.16],["Ordeal of Heliod","A25","Masters 25",27,0,"uncommon",2,"dd652c85-f8ca-4e38-a21b-f21b729bcf92",0.13],["Dáin, Lord of the Iron Hills","HOB","The Hobbit",8,0,"uncommon",2,"99d27749-d16c-45e9-accc-6a01351c17f9",0.28],["Qumulox","MM2","Modern Masters 2015",54,0,"uncommon",1,"357aa2a1-4f72-4890-aa46-d212292ab837",0.08],["Kraken of the Straits","BNG","Born of the Gods",42,0,"uncommon",1,"12ae69b3-afa5-4763-a0c8-c3d9d96f6ddc",0.35],["Mindscour Dragon","FRF","Fate Reforged",41,0,"uncommon",1,"c5708290-60ae-400c-b149-2a63153c2890",0.16],["Skyline Predator","RTR","Return to Ravnica",50,0,"uncommon",1,"5839556c-6635-44c4-96ed-666e4466b929",0.06],["Overwhelming Intellect","DDJ","Duel Decks: Izzet vs. Golgari",28,0,"uncommon",1,"9624bbf9-15b0-40f9-9f02-f2af3f1220f8",0.2],["Self-Reflection","FDN","Foundations",163,0,"uncommon",1,"e1e6abc9-25b2-4d51-b519-2525079eab51",0.15],["Grappling Kraken","FDN","Foundations",39,0,"uncommon",1,"d1f5cab3-3fc0-448d-8252-cd55abf5b596",0.27],["Phantom Carriage","MID","Innistrad: Midnight Hunt",70,0,"uncommon",1,"1990ed41-3739-40f6-8797-359f88af05f9",0.07],["Glacian, Powerstone Engineer","CMR","Commander Legends",72,0,"uncommon",1,"a736df42-18e9-4259-b0b8-54d21143e72e",0.19],["Duskmourn's Domination","DSK","Duskmourn: House of Horror",50,0,"uncommon",1,"1d96dbc9-c2fd-42c1-9d55-5c14fa1c1c6f",0.09],["Skaab Goliath","CMR","Commander Legends",97,0,"common",1,"d151fe63-3b3a-4cd4-9a2d-d80e7434e63c",0.2],["Air Servant","W16","Welcome Deck 2016",4,0,"uncommon",1,"01007d7f-e29b-49d5-bc60-44b2fb77ed3d",0.08],["Battleground Geist","INR","Innistrad Remastered",53,0,"common",1,"3507e285-fabb-45e3-af4c-52032558cf03",0.11],["Mind Control","M12","Magic 2012",67,0,"uncommon",1,"ec7f77af-17d7-4746-bc83-f455b9b6f9ea",0.24],["Switcheroo","M19","Core Set 2019",78,0,"uncommon",1,"9d3d062c-5853-44f9-b951-a264e9e0d72d",0.22],["Saruman the White","LTR","The Lord of the Rings: Tales of Middle-earth",67,0,"uncommon",1,"1bfccbab-29fa-4e92-8919-6cd4815fb655",0.2],["Depth Defiler","MH3","Modern Horizons 3",58,0,"uncommon",1,"37684797-7503-460d-9f74-047b1ab2fac3",0.16],["Air Elemental","W17","Welcome Deck 2017",7,0,"uncommon",1,"d8ecd6f4-d48f-4427-9ca4-bf414283a583",0.04],["Frostfist Strider","DMU","Dominaria United",51,0,"uncommon",1,"40141353-c0d6-4529-b26a-34dfccbcf231",0.16],["Way of the Mind Sculptor","FRA","Reality Fracture",224,0,"uncommon",1,"5838af68-66c3-4fe8-ab89-0a1721b0cfeb",0.28],["Soul Seizer // Ghastly Haunting","DKA","Dark Ascension",50,0,"uncommon",1,"f500cb95-d5ea-4cf2-920a-f1df45a9059b",0.13],["Stern Mentor","AVR","Avacyn Restored",77,0,"uncommon",1,"ffe4d34f-68f0-4d79-9aab-58c5304224d9",0.05],["Water Servant","MM2","Modern Masters 2015",69,0,"uncommon",1,"0ba4e555-7528-46fd-9cf8-aa1a70e2cc6a",0.02],["Swat Away","ECL","Lorwyn Eclipsed",75,0,"uncommon",1,"2fb0ea3f-2f6d-4b64-a9d7-e822c8854a03",0.17],["Master Thief","ZNC","Zendikar Rising Commander",30,0,"uncommon",1,"703f57d5-d8bb-4fb6-9dc9-71a5b4308f04",0.15],["Levitation","M12","Magic 2012",61,0,"uncommon",1,"63e5124a-67c0-44ed-8085-28bf37816423",0.32],["Clinquant Skymage","FDN","Foundations",33,0,"uncommon",1,"36012810-0e83-4640-8ba7-7262229f1b84",0.26],["Fact or Fiction","LTC","Tales of Middle-earth Commander",190,0,"uncommon",1,"74d189fc-48fe-40f5-ae56-34b4dfc068d0",0.3],["Aetherize","FDN","Foundations",151,0,"uncommon",1,"1e5530fc-0291-4a17-b048-c5d24e6f51d8",0.49],["Ninja of the Deep Hours","C18","Commander 2018",95,0,"common",1,"5fea7980-55e1-47c1-ab18-a89c976b55fc",1.52],["Traxos, Academy Guardian","FRA","Reality Fracture",222,0,"uncommon",1,"a349800f-b634-4e74-a9d9-185df37ad909",0.29],["Ravenhill Flock","HOB","The Hobbit",52,0,"uncommon",1,"acbb4d32-2771-469e-a6de-0df15155cc62",0.24],["Quash","BOK","Betrayers of Kamigawa",47,0,"uncommon",1,"48ca8c31-a9ea-4388-b257-951c1c68b86d",0.08],["Darkslick Drake","SOM","Scars of Mirrodin",30,0,"uncommon",1,"234f4131-1e7f-4220-b46c-bb4a6713876e",0.14],["Triton Fortune Hunter","THS","Theros",69,0,"uncommon",1,"1173ff96-998c-4fe7-9b28-602d990e0339",0.22],["Succumb to the Cold","WOE","Wilds of Eldraine",72,0,"uncommon",1,"c14d9fc0-bfbf-4359-93bf-5e53466965d6",0.28],["Tenacious Tomeseeker","WOE","Wilds of Eldraine",74,0,"uncommon",1,"c40be735-0780-459b-8dd2-a298575beaab",0.17],["Biolume Egg // Biolume Serpent","INR","Innistrad Remastered",54,0,"uncommon",1,"009c8a91-8c73-4e3f-9955-45344ae07832",0.16],["Arctic Aven","M13","Magic 2013",42,0,"uncommon",1,"06f6aab1-c400-4d87-b68e-f36552e7417f",0.09],["Tandem Lookout","MM3","Modern Masters 2017",53,0,"common",1,"3e44b411-ccb8-44c8-a021-2372c945f0d3",0.8],["Whirlwind Denial","THB","Theros Beyond Death",81,0,"uncommon",1,"9e127856-bedd-40a9-9e8e-d1f9fbefe07d",0.11],["Runic Repetition","C19","Commander 2019",94,0,"uncommon",1,"8cabd32b-187d-4a41-92b2-72c3b3216728",0.13],["Civilized Scholar // Homicidal Brute","ISD","Innistrad",47,0,"uncommon",1,"7bf864db-4754-433d-9d77-6695f78f6c09",0.12],["Saruman's Trickery","LTR","The Lord of the Rings: Tales of Middle-earth",68,0,"uncommon",1,"8eb6c23b-e52e-4533-9625-884eb0a4d866",0.21],["Curator's Ward","DOM","Dominaria",49,0,"uncommon",1,"10cc417f-0ea7-47a8-b7d0-aa8d20168faf",0.37],["Unwilling Vessel","DSK","Duskmourn: House of Horror",81,0,"uncommon",1,"5d1758ed-fe33-4ead-8c83-e54fabcb4cfe",0.17],["Niblis of the Breath","DKA","Dark Ascension",44,0,"uncommon",1,"0686843d-6d1e-4488-8c17-7c986a154195",0.24],["Elrond, Lord of Rivendell","LTR","The Lord of the Rings: Tales of Middle-earth",307,0,"uncommon",1,"308465a9-2143-49f2-b9d0-a09272dd1b62",0.25],["Mysterious Tome // Chilling Chronicle","MID","Innistrad: Midnight Hunt",63,0,"uncommon",1,"caa57b63-bb11-45e8-8795-de92ca61f4f1",0.23],["Matterbending Mage","SOS","Secrets of Strixhaven",59,0,"uncommon",1,"460c6afd-cddf-4fea-925f-b27517ff250a",0.19],["Icewrought Sentry","WOE","Wilds of Eldraine",55,0,"uncommon",1,"859419d3-cd15-4362-98b3-a7ff98e29692",0.21],["Warden of Evos Isle","CMR","Commander Legends",106,0,"uncommon",1,"6bfc5cef-aa9b-45d4-a9c3-4b157e4ed193",0.32],["Phantom Warrior","BBD","Battlebond",129,0,"uncommon",1,"93044619-0c1e-4e42-a654-a8869c73f8c5",0.26],["Uthros Psionicist","EOE","Edge of Eternities",84,0,"uncommon",1,"e23cc5fd-afe4-480c-8858-ed80a082584e",0.21],["Latch Seeker","AVR","Avacyn Restored",63,0,"uncommon",1,"3e4e7589-9cee-4d57-8648-ce733781bfb2",0.1],["Grizzled Angler // Grisly Anglerfish","INR","Innistrad Remastered",67,0,"uncommon",1,"16c0bb08-36b3-41e2-a5a9-2fcd6bb49beb",0.19],["Forbidden Alchemy","TDC","Tarkir: Dragonstorm Commander",152,0,"common",1,"04def7e3-10e4-4733-8c19-8fa6e4469086",0.26],["Imprisoned in the Moon","INR","Innistrad Remastered",69,0,"common",1,"0d150547-09f5-45ce-a825-89944b066bd4",0.33],["Council's Deliberation","LTR","The Lord of the Rings: Tales of Middle-earth",46,0,"uncommon",1,"651503a2-5d1e-408a-9cdc-0cee05ab3ef0",0.21],["Hermitic Nautilus","LCI","The Lost Caverns of Ixalan",58,0,"uncommon",1,"545503f8-a8c6-4518-9ad6-76e4996397fc",0.21],["Fog Bank","FDN","Foundations",591,0,"uncommon",1,"18748b1d-4161-482c-a726-8762b4c1819c",0.11],["Neutralizing Blast","FRF","Fate Reforged",44,0,"uncommon",1,"e549a8fc-6001-43db-88b1-ce8ed42a3443",0.1],["Narcomoeba","MMA","Modern Masters",55,0,"uncommon",1,"3de38943-8f61-4be9-839b-370830c555cf",0.29],["Roiling Dragonstorm","TDM","Tarkir: Dragonstorm",55,0,"uncommon",1,"455f4c96-684b-4b14-bd21-6799da2e1fa7",0.25],["Riddlesmith","NEC","Neon Dynasty Commander",96,0,"uncommon",1,"640ff8a9-9dff-4fc7-bafa-6afaa3d9c153",0.31],["Staunch Crewmate","LCI","The Lost Caverns of Ixalan",79,0,"uncommon",1,"143e9845-8a11-4fc4-b116-29a929985146",0.29],["Augur of Bolas","MM3","Modern Masters 2017",30,0,"common",1,"8f7eca7a-5f42-4e58-a6c0-8d07517bda8a",0.26],["Silvergill Mentor","ECL","Lorwyn Eclipsed",69,0,"uncommon",1,"e6e37fe8-459c-4992-8ae9-f782cddab2fe",0.22],["Unwelcome Sprite","ECL","Lorwyn Eclipsed",81,0,"uncommon",1,"902f8d86-fde2-4cdf-88f0-bf63d616f3af",0.2],["Incursion Specialist","GTC","Gatecrash",38,0,"uncommon",1,"290e56e0-e699-413a-9d6a-e740bf460b35",0.12],["Gainsay","THS","Theros",49,0,"uncommon",1,"e658939a-fa5a-4497-b35c-b6fbfa3f6882",0.08],["Faerie Vandal","ZNC","Zendikar Rising Commander",26,0,"uncommon",1,"04692219-8850-4b05-aa60-64f32b0daade",0.23],["Military Intelligence","ZNC","Zendikar Rising Commander",31,0,"uncommon",1,"28ba3c56-94f2-4bb3-86e2-e84d5b9fb013",0.36],["Covetous Castaway // Ghostly Castigator","INR","Innistrad Remastered",58,0,"uncommon",1,"4ff66f14-aee6-4ad2-be70-1c9bb39089b3",0.17],["Get Out","DSK","Duskmourn: House of Horror",60,0,"uncommon",1,"5d9471c8-2db9-4ce3-a1e5-42b85134cb8e",0.31],["Curiosity","WOT","Wilds of Eldraine: Enchanting Tales",17,0,"uncommon",1,"96056dc1-b989-4c87-8ad9-7a9dd99dd7fc",1.54],["Cobbled Lancer","INR","Innistrad Remastered",56,0,"uncommon",1,"ad933b4d-e1e7-49cc-aa18-8eee2ec8c8a5",0.17],["Scrabbling Skullcrab","DSK","Duskmourn: House of Horror",71,0,"uncommon",1,"c1017b8e-e7fa-41de-8eb2-2e4a59db5117",0.25],["Curiosity","ISD","Innistrad",49,0,"uncommon",1,"b212c36a-6d1f-4217-b384-1c2b0e07b68a",0.93],["Spectral Sailor","J22","Jumpstart 2022",64,0,"uncommon",1,"7743b587-e498-4761-9173-e803c9eed86b",0.94],["Shrieking Drake","MH3","Modern Horizons 3",272,0,"uncommon",1,"9f1cc39f-898c-4e92-82a0-a17606b60574",0.18],["Triton Wavebreaker","MH3","Modern Horizons 3",74,0,"uncommon",1,"41e68700-c71c-46db-b6a4-beae924cf97a",0.24],["Consign to Memory","MH3","Modern Horizons 3",54,0,"uncommon",1,"bc95af55-d1dd-4fe6-adb0-3ad6db20d986",3.85],["An Offer You Can't Refuse","FDN","Foundations",160,0,"uncommon",1,"a829747f-cf9b-4d81-ba66-9f0630ed4565",3.63],["Perfected Theory","FRA","Reality Fracture",34,0,"uncommon",1,"d0ecae06-bc5a-4886-84df-c2900816f226",0.18],["Quicken","RVR","Ravnica Remastered",57,0,"uncommon",1,"67751745-61c9-488f-b5b3-310c0bafdda7",0.34],["Telepathy","M10","Magic 2010",74,0,"uncommon",1,"ce03b4b4-612b-4fc9-b063-b0d367712eaf",0.9],["Memorial to Genius","C21","Commander 2021",301,0,"uncommon",1,"1d96dd97-ce88-4576-8261-c7866a06275d",0.27],["Cephalid Coliseum","TDC","Tarkir: Dragonstorm Commander",349,0,"uncommon",1,"03b9c9ed-fb6f-4f8d-bb1d-7999dec4245c",0.33],["Wanderwine Farewell","ECL","Lorwyn Eclipsed",83,0,"uncommon",2,"473123a0-1366-406b-9b9e-154c0e9c224f",0.15],["Ruric Thar, Biomagus","FRA","Reality Fracture",219,0,"uncommon",2,"00af4e87-5576-4a43-9422-4c35b2b66775",0.22],["Lake-town Mariners // Gone Fishing","HOB","The Hobbit",44,0,"uncommon",2,"4202a678-a5f4-47f9-9c18-e88ab9ad20a4",0.12],["Mindeye Drake","GTC","Gatecrash",43,0,"uncommon",2,"947f44b0-91be-4115-b499-57893f0f69a9",0.04],["Careful Consideration","TSR","Time Spiral Remastered",56,0,"uncommon",2,"08b7224b-adb9-4c31-b0bb-1c498f2922fb",0.31],["Sleep","M19","Core Set 2019",74,0,"uncommon",2,"e0c53e64-69cf-4296-8a1e-f8817f25c0b4",0.26],["Talrand's Invocation","NCC","New Capenna Commander",234,0,"uncommon",3,"88f43c2c-fee4-4df2-b326-a1d9840f64b0",0.21],["Lantern Spirit","ISD","Innistrad",62,0,"uncommon",2,"b50a5772-f411-458a-97f9-9f3967bb79c5",0.1],["Wall of Frost","MM3","Modern Masters 2017",56,0,"uncommon",2,"b5ab28ee-f70d-441b-bb4e-8e781f26e2bc",0.27],["Geistlight Snare","INR","Innistrad Remastered",66,0,"uncommon",2,"293511f6-09c2-4311-a2a6-0b0b7ef65bef",0.25],["Ioreth of the Healing House","LTR","The Lord of the Rings: Tales of Middle-earth",56,0,"uncommon",2,"03ab74cd-978a-49eb-9d38-bc8b472b3cef",0.37],["Invisible Stalker","ZNC","Zendikar Rising Commander",27,0,"uncommon",2,"14d265aa-c1d8-4faa-b282-5c273ab725fd",1.14],["Essence Scatter","FDN","Foundations",153,0,"uncommon",3,"dd05c850-f91e-4ffb-b4cc-8418d49dad90",0.18],["Spell Blast","M14","Magic 2014",72,0,"uncommon",2,"42d7af6a-bfd1-4e89-965a-68336507a9ee",0.04],["Gridlock","GTC","Gatecrash",36,0,"uncommon",2,"b4f5c126-3df9-4771-9e74-4ca33161ac08",0.13],["Blustersquall","C15","Commander 2015",89,0,"uncommon",3,"1736aaf7-b61d-426e-af5e-f70272e7b07e",0.42],["Sisay's Ring","CMR","Commander Legends",340,0,"common",1,"20c0e608-0208-408a-b473-1e54caa96cea",0.33],["Golgari Keyrune","RTR","Return to Ravnica",229,0,"uncommon",1,"913b803f-ba82-4660-86be-49677d1e32c9",0.19],["Orzhov Keyrune","GTC","Gatecrash",233,0,"uncommon",1,"fd5c0f38-916a-4f6c-b678-7447cb0709e0",0.17],["Izzet Keyrune","RTR","Return to Ravnica",230,0,"uncommon",1,"83e4e83b-cbb8-4efd-b6c4-4459a29177ac",0.27],["Gruul Keyrune","GTC","Gatecrash",230,0,"uncommon",1,"7cf96f1c-066e-4fde-acb8-4674842fb6c2",0.14],["Everflowing Chalice","EOC","Edge of Eternities Commander",137,0,"uncommon",1,"e4ed0052-d6dd-4f69-8313-10863baefac9",0.37],["Prismatic Lens","OTC","Outlaws of Thunder Junction Commander",264,0,"uncommon",1,"74e8d3a8-5937-4108-b2fe-23e049379345",0.41],["Darksteel Ingot","OTC","Outlaws of Thunder Junction Commander",256,0,"uncommon",1,"f279fcf1-e4f5-4873-9d73-8d62e0343b81",0.43],["Azorius Cluestone","DGM","Dragon's Maze",136,0,"common",1,"09eeb301-bc28-4515-ad69-0b1b5164a5bc",0.12],["Rakdos Cluestone","DGM","Dragon's Maze",143,0,"common",1,"9ef43817-1813-4608-8e3d-3c14321ab736",0.19],["Simic Cluestone","DGM","Dragon's Maze",145,0,"common",1,"e3c47552-afed-463d-bd24-13eb1cd724fc",0.19],["Selesnya Cluestone","DGM","Dragon's Maze",144,0,"common",1,"34ad5631-439a-43e2-b00a-04f78d66b8e6",0.22],["Thought Vessel","DSC","Duskmourn: House of Horror Commander",256,0,"common",1,"71b11bf4-35ab-4028-961f-5180a12dac82",2.98],["Thran Dynamo","BLC","Bloomburrow Commander",290,0,"uncommon",1,"6455b185-aa5e-45e1-951e-f6eef517daf2",4.41],["Worn Powerstone","MH3","Modern Horizons 3",298,0,"uncommon",1,"ace686ad-9e3f-41b3-b8eb-d1b6d45eb4e1",0.39],["Skullclamp","MOC","March of the Machine Commander",379,0,"uncommon",1,"a36fd6d8-66a2-49d1-b9f3-b400ebc03674",7.24],["Mask of Avacyn","CMR","Commander Legends",466,0,"uncommon",1,"0aa1b193-c80e-4026-bd82-f16314e14431",1.32],["Swiftfoot Boots","TDC","Tarkir: Dragonstorm Commander",328,0,"uncommon",1,"1969b151-3192-4d35-80ca-c4e180601ec8",2.89],["Command Tower","M3C","Modern Horizons 3 Commander",331,0,"common",4,"27e36832-09ca-4070-8511-94580014c3ed",0.35],["Wayfarer's Bauble","TDC","Tarkir: Dragonstorm Commander",335,0,"common",4,"ac1960a1-9141-468c-b96c-6c8e6905084d",0.38],["Commander's Sphere","ECC","Lorwyn Eclipsed Commander",139,0,"common",3,"a0d50603-e31f-4cd7-b4b6-49847d99eb2e",0.31],["Boros Keyrune","GK1","GRN Guild Kit",96,0,"uncommon",3,"e72ae9bc-d0a7-4adb-866d-94b8453a2837",0.27],["Dimir Keyrune","CLB","Commander Legends: Battle for Baldur's Gate",856,0,"uncommon",2,"69d1dd6c-21d3-4fe8-af1b-7088dcceef08",0.36],["Sol Ring","M3C","Modern Horizons 3 Commander",305,0,"uncommon",4,"19911e6e-7c35-4281-b31c-266382f052cc",1.91],["Arcane Signet","M3C","Modern Horizons 3 Commander",283,0,"common",4,"156a1ca1-e4b1-4e0c-a786-fd80fe189896",0.81],["Boros Cluestone","CM2","Commander Anthology Volume II",175,0,"common",2,"3084f7ac-6b9b-48ad-b39c-3d7b7fb79422",0.35],["Gruul Cluestone","DGM","Dragon's Maze",140,0,"common",2,"bc47d1fe-8ab2-42f6-bcab-4bc2084ceba7",0.21],["Mind Stone","WHO","Doctor Who",244,0,"uncommon",3,"6ac8db7a-009a-4141-bba7-b5fdfaf8d245",0.38],["Heraldic Banner","FDN","Foundations",254,0,"uncommon",2,"743ea709-dbb3-4db8-a2ce-544f47eb6339",0.35],["Prowler's Helm","THS","Theros",219,0,"uncommon",4,"c100a22c-bf34-42b7-9339-4733698c0935",0.58],["Rogue's Passage","WHO","Doctor Who",299,0,"uncommon",3,"74f3b1cb-e436-40f9-904c-f5696aa6f383",0.73],["Evolving Wilds","DSC","Duskmourn: House of Horror Commander",274,0,"common",6,"e524216c-ed35-49a3-868f-7ad0a0027a80",0.23],["Terramorphic Expanse","PIP","Fallout",313,0,"common",5,"548805de-3e2e-4f1f-aafc-d89fddf8288a",0.37],["Path of Ancestry","CMM","Commander Masters",661,0,"common",3,"7f3d574a-72b5-43be-b4b5-87865bbc7b5c",1.11],["Pathrazer of Ulamog","CMM","Commander Masters",4,0,"uncommon",1,"c9b1d4d8-7df9-41e0-b2d9-dbca9c9f6994",2.65],["Artisan of Kozilek","M3C","Modern Horizons 3 Commander",153,0,"uncommon",1,"c632f5a4-7f5f-4d77-9364-58ea03dfdcad",1.07],["Bane of Bala Ged","CMM","Commander Masters",802,0,"uncommon",1,"c3cb0fff-da50-40b9-9839-68cdf25a0193",2.66],["Meteor Golem","CMM","Commander Masters",399,0,"uncommon",1,"cd7af704-a770-4f90-8fe8-a45457785a35",0.25],["Frogmyr Enforcer","MH3","Modern Horizons 3",120,0,"uncommon",1,"981fdd21-a650-4360-9ea5-550399d1da91",0.29],["Geistcatcher's Rig","INR","Innistrad Remastered",264,0,"uncommon",1,"0b8f741c-919e-457d-8a02-c7282c1305ec",0.12],["Eldrazi Ravager","MH3","Modern Horizons 3",5,0,"uncommon",1,"0ce97bb8-b0ee-4473-8c26-a3ec91abec97",0.25],["Thran Golem","PCA","Planechase Anthology",114,0,"uncommon",1,"1d812b2b-3dcd-4aed-9f8a-ddc2f1561c6f",0.2],["Stone Golem","M20","Core Set 2020",240,0,"common",1,"1b4de70a-729b-4566-b6f3-c76f551405a5",0.07],["Geth's Grimoire","DST","Darksteel",123,0,"uncommon",1,"0a21d76d-d86c-4348-be45-f65167d2b5a9",9.79],["Icy Manipulator","DMR","Dominaria Remastered",225,0,"uncommon",1,"ac5a54ca-f175-4005-895f-d76effd6178e",0.27],["Scampering Surveyor","LCI","The Lost Caverns of Ixalan",260,0,"uncommon",1,"afcb2a90-d4c0-4c83-8ee7-2ac3a23b4402",0.34],["Galvanic Juggernaut","INR","Innistrad Remastered",263,0,"uncommon",1,"9cc1c735-22ad-4714-84e7-253df00941fa",0.13],["Primal Clay","A25","Masters 25",228,0,"common",1,"1e51f1b3-d8a3-4746-b0db-67d5ec71fb17",0.18],["Demonmail Hauberk","INR","Innistrad Remastered",261,0,"uncommon",1,"3fcb057e-0a6f-4ed0-bdb6-1c1b93f5ad9c",0.23],["Grafted Exoskeleton","ONC","Phyrexia: All Will Be One Commander",132,0,"uncommon",1,"d9218955-6604-49de-9153-6301d216e3bb",7.55],["Rod of Ruin","M14","Magic 2014",217,0,"uncommon",1,"9a0e90b8-bc38-4e1c-92ca-ac562cc57e31",0.08],["Assault Suit","40K","Warhammer 40,000 Commander",230,0,"uncommon",1,"d7fbad75-725f-44fc-919a-6b07f2d54698",0.41],["Traxos, Scourge Eternal","FRA","Reality Fracture",280,0,"uncommon",1,"05102c46-96f8-44a0-a1e6-e388fa5e0841",0.16],["Warden of the Wall","DKA","Dark Ascension",153,0,"uncommon",1,"fd1a1f48-d46b-4b8e-a642-fc70fd9ef7df",0.17],["Palladium Myr","CMM","Commander Masters",967,0,"uncommon",1,"f7c6aba3-38c3-45d1-83e1-40829eb07862",1.2],["Staff of the Wild Magus","M15","Magic 2015",236,0,"uncommon",1,"e64f31e8-0b49-4510-a4df-2e0bea793d3e",0.2],["Angel's Tomb","INR","Innistrad Remastered",253,0,"uncommon",1,"b465d09e-efad-48b6-a89a-f7da0c572991",0.27],["Junk Diver","MH3","Modern Horizons 3",293,0,"uncommon",1,"6b5d53cb-bf80-43b0-b839-b11a64ff4c1b",0.28],["Sunbird Standard // Sunbird Effigy","LCI","The Lost Caverns of Ixalan",262,0,"uncommon",1,"e0b6d40a-fded-4625-b03c-765c88d75766",0.21],["Gem of Becoming","M13","Magic 2013",205,0,"uncommon",1,"0e07bc36-2207-48f4-a151-4ccb0c6d851d",0.22],["Raugrin Crystal","IKO","Ikoria: Lair of Behemoths",238,0,"uncommon",1,"c5bce0fb-53d6-47ee-8c5a-a99e50f67fc9",0.23],["Wall of Spears","DPA","Duels of the Planeswalkers",96,0,"common",1,"ab3cd4d4-f697-4ff8-a56a-a1d47513da5d",0.49],["Angelic Armaments","CMR","Commander Legends",296,0,"uncommon",1,"92824de1-23f2-44c6-b8ab-46db94b8f79e",0.21],["Chalice of Life // Chalice of Death","INR","Innistrad Remastered",257,0,"uncommon",1,"e432b156-baf0-48a1-b8fb-1aa18bfbf7de",0.35],["Chitinous Cloak","OGW","Oath of the Gatewatch",163,0,"uncommon",1,"15e54603-af67-497f-afe0-88cfa4d00095",0.15],["The Black Arrow","HOB","The Hobbit",171,0,"uncommon",1,"ab181190-d53d-4972-8cd5-8e54b45f2276",0.14],["Haunted Cloak","CMM","Commander Masters",389,0,"common",1,"abffd0a3-ea7a-43cf-b92d-d9f436bef58e",0.36],["Staff of the Death Magus","M15","Magic 2015",232,0,"uncommon",1,"84a341a4-8177-41cd-a3bc-eff5dee48c94",0.33],["Staff of the Sun Magus","M15","Magic 2015",235,0,"uncommon",1,"e1f51ff4-9b5c-4e26-b811-4000a4c8f965",0.16],["Chariot of Victory","JOU","Journey into Nyx",159,0,"uncommon",1,"c2dd03d2-05ef-4929-b973-3dbe49fc7592",0.51],["Trip Noose","DDF","Duel Decks: Elspeth vs. Tezzeret",65,0,"uncommon",1,"ac039d9a-d248-497f-ac84-16ccc568f283",0.19],["Lupine Prototype","INR","Innistrad Remastered",267,0,"uncommon",1,"ae02ff5c-c667-4cb6-8bf4-8532d82c4fbf",0.3],["Cranial Plating","2XM","Double Masters",245,0,"uncommon",1,"e1375f17-bc25-4a65-98b7-4785bbdbe974",0.39],["Banshee's Blade","MRD","Mirrodin",144,0,"uncommon",1,"b77baad4-2bd6-492a-86ca-8e0088b751d2",0.3],["Ravenous Amulet","FDN","Foundations",131,0,"uncommon",1,"80cadee5-6f26-4440-ad31-a8e573a90436",0.18],["Millstone","M19","Core Set 2019",242,0,"uncommon",1,"c2051fd0-99cf-4e11-a625-8294e6767e5b",0.22],["Silverskin Armor","MBS","Mirrodin Besieged",132,0,"uncommon",1,"d1dba839-bd1e-4ce8-ab90-005eb1f0102e",0.25],["Kraken's Eye","M12","Magic 2012",211,0,"uncommon",1,"48052433-c4d3-434e-a609-e8400150a0f6",0.1],["Solar Transformer","DRC","Aetherdrift Commander",137,0,"uncommon",1,"fbc1c8dd-ea66-4dc3-8444-9f20758a45f7",0.32],["Jeskai Monument","TDM","Tarkir: Dragonstorm",244,0,"uncommon",1,"d0193ad6-39b7-4558-bd3e-36f809332ea2",0.15],["Hidden Blade","ACR","Assassin's Creed",73,0,"uncommon",1,"a07a488f-cb64-4f4c-9c2e-6cdb5d563f13",0.31],["Suspicious Bookcase","CMM","Commander Masters",977,0,"uncommon",1,"3803dd5f-32cb-45c3-ab0b-55a706549ba5",0.21],["Dragon's Claw","M12","Magic 2012",206,0,"uncommon",1,"0d732b87-08e5-41b6-8448-62dd6bf20d9c",0.2],["Ring of Thune","CMR","Commander Legends",468,0,"uncommon",1,"fda91fbd-bf5b-46c4-bd96-037b507f3daa",0.18],["Surestrike Trident","DST","Darksteel",147,0,"uncommon",1,"cfcb621d-5831-4b7c-b3e1-c321a6e10392",1.54],["Glaive of the Guildpact","GRN","Guilds of Ravnica",236,0,"uncommon",1,"e19723ad-7bd2-49ee-a57a-ece99018f4e8",0.21],["Wastescape Battlemage","MH3","Modern Horizons 3",17,0,"uncommon",1,"6bc119b8-429c-4ab6-adba-b65b03810e98",0.23],["Stone of Erech","LTR","The Lord of the Rings: Tales of Middle-earth",251,0,"uncommon",1,"bc02e193-df33-4eb1-adc1-b51ee931218a",0.31],["Flamecast Wheel","THS","Theros",215,0,"uncommon",1,"5cfa31c9-5a11-4366-9063-056a659f3d0d",0.04],["Vial of Poison","M14","Magic 2014",226,0,"uncommon",1,"7769159b-5a6a-45e5-b69b-8db2a6ef5418",0.2],["Avacyn's Collar","DKA","Dark Ascension",145,0,"uncommon",1,"972e9a78-204b-4012-b394-b40fd0edac4c",0.22],["Adventuring Gear","FDN","Foundations",249,0,"uncommon",1,"361f9b99-5b5d-40da-b4b9-5ad90f6280ee",0.23],["Skeleton Key","SOI","Shadows over Innistrad",263,0,"uncommon",1,"3168317b-b166-483e-9d9a-20cdfcdc255c",0.27],["Chronomaton","DDM","Duel Decks: Jace vs. Vraska",2,0,"uncommon",1,"787b6916-3fce-41dd-ab52-f17546fd04ed",0.26],["Hot Soup","M15","Magic 2015",219,0,"uncommon",1,"cc46f4b0-1992-4060-8f21-643698d476f7",0.37],["Profane Memento","M15","Magic 2015",226,0,"uncommon",1,"f2c97632-3cf1-4b79-9d18-d8991654dcca",1.08],["Barrow-Blade","LTR","The Lord of the Rings: Tales of Middle-earth",237,0,"uncommon",1,"f0eb7284-78a5-4b5e-8f6d-6be540e0bef8",0.21],["Gorgon's Head","BNG","Born of the Gods",158,0,"uncommon",1,"d745dd92-9f7a-44a4-a27f-2ff17753db1c",0.76],["Fountain of Renewal","M19","Core Set 2019",235,0,"uncommon",1,"26894980-8961-4479-85dd-5f01c899718b",1.13],["Eye of Jace","FRA","Reality Fracture",170,0,"uncommon",1,"0edba64a-39cf-4a8d-ba20-4f7da10b6c3d",0.23],["Null Elemental Blast","MH3","Modern Horizons 3",12,0,"uncommon",1,"8e259868-d29a-4c03-8ec3-49e914f849fb",0.33],["The Grey Havens","LTR","The Lord of the Rings: Tales of Middle-earth",443,0,"uncommon",1,"9714aa30-1db2-4670-9a0b-72acfc3f703c",0.29],["Cavernous Maw","LCI","The Lost Caverns of Ixalan",270,0,"uncommon",1,"2a51ebf6-a465-42e2-82b7-d2cb928ca632",0.23],["Shimmering Grotto","IMA","Iconic Masters",248,0,"common",1,"e03f2594-c6e8-4758-86b4-885d1dba3a91",0.28],["Nesting Grounds","ECC","Lorwyn Eclipsed Commander",155,0,"rare",1,"c25ad164-4076-496d-833c-d607391b1ac8",0.26],["Eclipsed Realms","ECL","Lorwyn Eclipsed",263,0,"uncommon",1,"a174f0db-8b4f-4c37-9583-44c92d37b9c0",0.39],["Secluded Courtyard","FDN","Foundations",267,0,"uncommon",1,"d13373d2-139b-48c7-a8c9-828cefc4f150",0.34],["Phyrexian Hulk","M13","Magic 2013",209,0,"uncommon",2,"a761426e-2138-438e-8f3b-024486165260",0.14],["Farsight Mask","PCA","Planechase Anthology",109,0,"uncommon",2,"48bde648-810a-4859-bbdd-265e932e1f7f",0.42],["Juggernaut","FDN","Foundations",255,0,"uncommon",2,"f4468fff-cd6f-428c-b7a0-ff89f5bbea2e",0.08],["Jayemdae Tome","ORI","Magic Origins",231,0,"uncommon",3,"518af905-f518-4269-89b4-781085be8dd2",0.15],["Barbed Battlegear","SOM","Scars of Mirrodin",139,0,"uncommon",2,"03b80b2f-8d07-4ad3-9b20-4ba0fe9f37a2",0.26],["Greatsword","M12","Magic 2012",209,0,"uncommon",2,"63b4041d-7c95-4cb9-a18b-6568db05942b",0.12],["Staff of the Flame Magus","M15","Magic 2015",233,0,"uncommon",2,"0fd137db-296a-4c17-ba46-8b189d96c1f9",0.14],["Haunted Screen","DSK","Duskmourn: House of Horror",250,0,"uncommon",2,"5e7d552f-a7ac-4a49-a582-9d378137005f",0.16],["Butcher's Cleaver","INR","Innistrad Remastered",256,0,"uncommon",2,"3c55bce1-8746-4554-9876-f443c37a125b",0.29],["Fireshrieker","FDN","Foundations",674,0,"uncommon",2,"484fbce6-71bd-40eb-a71b-86958a094708",0.22],["Ring of Valkas","CMR","Commander Legends",469,0,"uncommon",2,"cb3c0bc4-6f89-48e2-b525-5efcb091bc5e",0.41],["Ring of Evos Isle","M13","Magic 2013",211,0,"uncommon",2,"a7c740a8-1bbc-4ec8-a72c-01aee9e48f3d",0.39],["Manriki-Gusari","SOK","Saviors of Kamigawa",156,0,"uncommon",2,"9bc6542b-7672-4ea1-816c-33bc0c300f3c",0.33],["Elixir of Immortality","C21","Commander 2021",243,0,"uncommon",5,"6741ab27-9e1f-4aa5-96b9-b450eda7c5c2",0.97],["Large Bear","HOB","The Hobbit",159,0,"uncommon",1,"50202288-f433-4b56-8f60-349bda7b4f6b",0.19],["Necrogen Rotpriest","ONE","Phyrexia: All Will Be One",296,0,"uncommon",1,"a4b4fe48-f9e6-4606-9901-76dd85fd7038",0.18],["Rot Farm Skeleton","DGM","Dragon's Maze",98,0,"uncommon",1,"ef5af2dd-75c7-402c-be9a-3d0d4290520c",0.21],["Shaman of the Pack","KHC","Kaldheim Commander",92,0,"uncommon",1,"da9705e2-40e5-4ec9-8aef-2eab28d5a66f",1.09],["Leyline Prowler","C21","Commander 2021",222,0,"uncommon",1,"c5d9286d-449b-4959-98ae-bd6a35be221d",0.43],["Korozda Guildmage","GK1","GRN Guild Kit",66,0,"uncommon",1,"37622ca4-5627-4cae-af60-c4a2a4368cec",0.26],["Swarm Guildmage","GRN","Guilds of Ravnica",201,0,"uncommon",1,"7599adc7-72b2-4079-ac0a-1a821f9de925",0.12],["Teacher's Pest","SOS","Secrets of Strixhaven",238,0,"uncommon",1,"eaa358ac-761d-4507-aa15-3d4684027207",0.27],["Thoughtflare","RTR","Return to Ravnica",203,0,"uncommon",1,"d90514aa-e356-4502-9e0e-76ab7644a07a",0.16],["Crackling Drake","RVR","Ravnica Remastered",174,0,"uncommon",1,"73957e3b-504d-4ac7-a69c-0b81cb9af402",0.17],["Twinflame Travelers","ECL","Lorwyn Eclipsed",248,0,"uncommon",1,"5fc9f409-3aef-4403-bf17-6e9a72ecfada",0.32],["Goblin Test Pilot","DGM","Dragon's Maze",74,0,"uncommon",1,"a8dbb9aa-1bf8-447d-a96c-33e2248bfb01",0.06],["Gandalf's Sanction","LTR","The Lord of the Rings: Tales of Middle-earth",208,0,"uncommon",1,"8ebf2a25-9bee-4146-af83-f22aab6db2a8",0.25],["Wandering Mind","INR","Innistrad Remastered",252,0,"uncommon",1,"b57491d9-ac52-4598-ac36-bed842f141a1",0.12],["Lore Drakkis","IKO","Ikoria: Lair of Behemoths",194,0,"uncommon",1,"83e035ca-eccd-4b63-817c-f2c676b9c98d",0.18],["Flaring Cinder","ECL","Lorwyn Eclipsed",225,0,"common",1,"0691a1a9-18e7-44b7-9a34-764b1ab45a76",0.11],["Cyclops Superconductor","MH3","Modern Horizons 3",182,0,"common",1,"69ce6839-92d1-497b-9760-6fdc7388614e",0.19],["Rush of Inspiration // Crackling Falls","MH3","Modern Horizons 3",257,0,"uncommon",1,"70a25a3a-c12a-49d3-8a91-a108dfa9d3c5",0.22],["Electrolyze","GK1","GRN Guild Kit",37,0,"uncommon",1,"b7dda3bf-08a9-42f7-bc64-4a41f6f210fa",0.31],["Abstract Paintmage","SOS","Secrets of Strixhaven",171,0,"uncommon",1,"ea008094-d995-4740-9b39-c61049356c55",0.22],["Smoky Lounge // Misty Salon","DSK","Duskmourn: House of Horror",235,0,"uncommon",1,"4700987d-fc55-44eb-bc9f-0e0316ca65e2",0.14],["Balmor, Battlemage Captain","FDN","Foundations",237,0,"uncommon",1,"0b45ab13-9bb6-48af-8b37-d97b25801ac8",0.31],["Nivix Guildmage","GK1","GRN Guild Kit",42,0,"uncommon",1,"603e7dd3-c361-4e66-9df5-4b24f40734e8",0.27],["Teleportal","MM3","Modern Masters 2017",193,0,"uncommon",1,"b8322a64-f1a0-49c6-ad59-2b803598f7d1",0.1],["Stormcatch Mentor","SOC","Secrets of Strixhaven Commander",331,0,"uncommon",1,"f1bbb5ad-a293-48f3-a3d0-7ac85a7b8467",0.34],["Shadowfax, Lord of Horses","LTR","The Lord of the Rings: Tales of Middle-earth",227,0,"uncommon",1,"4c7d861d-7832-4c15-8d6c-8c07a9a57891",0.24],["Fortress Cyclops","GTC","Gatecrash",164,0,"uncommon",1,"39f835f0-abba-402c-bdae-be03ad3fb658",0.13],["Blaze Commando","DGM","Dragon's Maze",56,0,"uncommon",1,"5e179f0d-2965-44e4-8483-67b330a8608c",0.09],["Ordruun Veteran","GTC","Gatecrash",184,0,"uncommon",1,"20fea3f6-e64a-4964-86bc-c0b8fef0ab25",0.09],["Sami, Ship's Engineer","EOE","Edge of Eternities",225,0,"uncommon",1,"75c38cc9-07de-46d4-8195-f04b2b7e0fee",0.18],["Markov Waltzer","INR","Innistrad Remastered",245,0,"uncommon",1,"231f4da2-8756-4f99-a46f-b8afe9adb80d",0.22],["Warleader's Helix","DGM","Dragon's Maze",116,0,"uncommon",1,"81e474ac-54f7-43f9-8af9-2f1adf258b15",0.22],["Scurry of Gremlins","MH3","Modern Horizons 3",203,0,"uncommon",1,"470ce8e9-64b9-403c-bee0-66a4c47ca6d4",0.15],["Arrows of Justice","GTC","Gatecrash",211,0,"uncommon",1,"c64a15f4-6e2f-4479-95da-8805ce2091fa",0.05],["Lightning Helix","2X2","Double Masters 2022",243,0,"uncommon",1,"58f25737-a195-4763-bc23-b3c4d38b9e58",0.32],["Ash, Party Crasher","WOE","Wilds of Eldraine",201,0,"uncommon",1,"d51e6610-25b6-4d8e-92d7-c50a2ff844ff",0.16],["Legion Leadership // Legion Stronghold","MH3","Modern Horizons 3",255,0,"uncommon",1,"7676abd9-0a3d-4721-b17b-778d2e3c2e25",0.44],["Truefire Paladin","DDL","Duel Decks: Heroes vs. Monsters",8,0,"uncommon",1,"a42906c1-cf32-4c14-b08a-d800d1858d8f",0.1],["Sunhome Guildmage","GK1","GRN Guild Kit",95,0,"uncommon",1,"d1d2de3e-5885-45df-8570-69d2d3e0e25c",0.32],["Sacred Fire","MID","Innistrad: Midnight Hunt",239,0,"uncommon",1,"c0b1dcd7-6dd9-4134-bc6c-9dc7754006a2",0.27],["Legolas, Counter of Kills","LTR","The Lord of the Rings: Tales of Middle-earth",212,0,"uncommon",1,"c8bd408c-9e6d-436d-9c4f-9ef3203aeb64",0.22],["Quandrix Cultivator","STX","Strixhaven: School of Mages",218,0,"uncommon",1,"e3ca9ff7-0dcf-4ecc-879c-957d290ad7f5",0.26],["Horizon Chimera","C16","Commander 2016",204,0,"uncommon",1,"7022506d-8685-41e0-bd1a-2c27c964128b",0.18],["Legolas, Counter of Kills","LTR","The Lord of the Rings: Tales of Middle-earth",324,0,"uncommon",1,"30fe0cb4-71f0-4acb-af1a-a48775826487",0.27],["Thranduil, Sindarin Liege // Silvan Rally","HOB","The Hobbit",233,0,"uncommon",1,"0992ce8b-7bef-4799-a52d-7a46021a8672",0.65],["Krasis Incubation","DGM","Dragon's Maze",79,0,"uncommon",1,"8da986da-e8ee-4b53-8bbd-9285d0f7f3cb",0.03],["Nimbus Swimmer","GK2","RNA Guild Kit",120,0,"uncommon",1,"bd3219c1-b336-4f91-acb5-24b4e1f05464",0.27],["Quandrix Apprentice","SOC","Secrets of Strixhaven Commander",324,0,"uncommon",1,"f9166814-8748-480a-b7a0-816f9f582420",0.29],["Zameck Guildmage","GK2","RNA Guild Kit",129,0,"uncommon",1,"b9b4d790-67db-41f3-b4db-9c5b7c1f8884",0.4],["Decisive Denial","OTP","Breaking News",42,0,"uncommon",1,"54ee0802-62c1-46ac-907e-82ace59fbddb",0.28],["Simic Charm","CMR","Commander Legends",451,0,"uncommon",1,"3384ee4e-738f-4442-bccd-4f96022b7219",3.79],["Sentry of the Underworld","THS","Theros",202,0,"uncommon",1,"018a9c98-1cb4-4c53-a765-c15808c4ab44",0.09],["Agent of Masks","MM3","Modern Masters 2017",149,0,"uncommon",1,"7d6ace1f-c056-494d-a41f-75efa54312a5",0.27],["Twisted Fates","FRA","Reality Fracture",158,0,"uncommon",1,"c7c0765d-38fd-4d7b-bfb4-49b10ff5939b",0.17],["Vizkopa Confessor","GTC","Gatecrash",205,0,"uncommon",1,"cac639b9-6c20-45ac-a61f-082bdcebdb83",0.27],["Cliffhaven Vampire","OGW","Oath of the Gatewatch",153,0,"uncommon",1,"5544247d-1f8f-443f-a4c4-d8461db28a79",0.59],["Marshal of the Lost","TDM","Tarkir: Dragonstorm",207,0,"uncommon",1,"64fbaa16-67c3-4ed2-9545-39abbbde61dc",0.2],["Debt to the Deathless","RVR","Ravnica Remastered",176,0,"uncommon",1,"a42f8d69-dff4-4c35-a5fc-527ea5f1d21b",0.41],["Hardened Tactician","TDM","Tarkir: Dragonstorm",191,0,"uncommon",1,"86b225cb-5c45-4da1-a64e-b04091e483e8",0.29],["Markov Purifier","VOW","Innistrad: Crimson Vow",241,0,"uncommon",1,"bb95d34a-0b13-4533-9efc-08381c81e6cd",0.32],["Night // Day","DMR","Dominaria Remastered",214,0,"uncommon",1,"eccff9be-a18d-4fad-b23a-7f66ae9dbfed",0.07],["Cartel Aristocrat","RVR","Ravnica Remastered",170,0,"uncommon",1,"e2dec477-5764-4c0c-bb10-42d64ad2103e",0.33],["Shay Cormac","ACR","Assassin's Creed",153,0,"uncommon",1,"bf3012ba-1537-4f54-bb4a-65b909b87e59",0.27],["Shadow Summoning","LTR","The Lord of the Rings: Tales of Middle-earth",226,0,"uncommon",1,"ec0984b2-bed6-41b1-9087-2cfd16749037",0.23],["Rite of Oblivion","MID","Innistrad: Midnight Hunt",237,0,"uncommon",1,"fe1f8d52-565e-4900-8357-fd29f2022dc1",0.37],["Orzhov Guildmage","CLU","Ravnica: Clue Edition",201,0,"uncommon",1,"5eb5c82b-71aa-4c94-bda0-3e5abe10ea67",0.12],["Despark","FRC","Reality Fracture Commander",50,0,"uncommon",1,"2c09f45f-54a5-47b5-afd7-9ac7c05438e7",0.24],["Shrouded Shepherd // Cleave Shadows","WOE","Wilds of Eldraine",236,0,"uncommon",1,"ab03c342-2bf4-41bf-8bb8-472d978d238a",0.18],["Corpse Knight","MOC","March of the Machine Commander",321,0,"uncommon",1,"7aa3f166-c5d1-40f0-9b23-352424b8e13a",0.65],["Elas il-Kor, Sadistic Pilgrim","DMU","Dominaria United",297,0,"uncommon",1,"552fbde6-515d-457e-81c9-d67157eaaf37",0.82],["Forsaken Sanctuary","C18","Commander 2018",247,0,"uncommon",1,"f3e0b983-62e7-43fb-b5d5-402ea60a64d7",0.2],["Fall of the Gavel","RTR","Return to Ravnica",161,0,"uncommon",1,"64f42848-963b-4b16-aeec-66d0f349758b",0.12],["Sky Hussar","RVR","Ravnica Remastered",224,0,"uncommon",1,"cccfd565-99db-4c24-a16d-665b0823a159",0.24],["Jelenn Sphinx","BBD","Battlebond",224,0,"uncommon",1,"5e868618-c1b0-4ab9-96b2-6435e52b8b07",0.16],["Ascended Lawmage","CN2","Conspiracy: Take the Crown",198,0,"uncommon",1,"e90d9cc4-9444-4610-ace5-c2981809b331",0.05],["Drogskol Captain","DKA","Dark Ascension",136,0,"uncommon",1,"b8238e36-625f-460d-9e39-fd501e65490c",0.29],["Emissary of Soulfire","MH3","Modern Horizons 3",183,0,"uncommon",1,"4663e9e3-1989-4ddb-9508-9cc055d2ebe9",0.23],["Jubilant Skybonder","IKO","Ikoria: Lair of Behemoths",223,0,"uncommon",1,"7f8f2d69-fba9-40e5-8ef7-75e14ef4070a",0.32],["Empyrean Eagle","FDN","Foundations",239,0,"uncommon",1,"577e99a7-4a55-4314-8f08-2ae0c33b85c7",0.29],["Deepchannel Duelist","ECL","Lorwyn Eclipsed",213,0,"uncommon",1,"1b742172-7118-45e7-9945-62bd77d94e85",0.23],["Prince Imrahil the Fair","LTR","The Lord of the Rings: Tales of Middle-earth",219,0,"uncommon",1,"7d486def-7c3f-41e9-bb28-4582450a7b9e",0.2],["Station Monitor","EOE","Edge of Eternities",230,0,"uncommon",1,"ba9f6d16-ee3e-4fbb-b78a-6292188eb61f",0.21],["Scab-Clan Giant","2X2","Double Masters 2022",272,0,"uncommon",1,"68aa496d-15c0-4da0-b3c9-4bb7e57d9a31",0.07],["Rulik Mons, Warren Chief","DMU","Dominaria United",217,0,"uncommon",1,"3fa49711-473d-4774-99b8-2bfbabc6b735",0.21],["Immerwolf","DKA","Dark Ascension",141,0,"uncommon",1,"9326061f-ea76-4be7-a06f-aefb63454777",0.48],["Rhythm of the Wild","RVR","Ravnica Remastered",217,0,"uncommon",1,"c2a6453e-a373-44ec-807a-15c0c8b1af57",4.74],["Noggle Robber","ECL","Lorwyn Eclipsed",237,0,"uncommon",1,"0082ca96-10f3-4823-be16-117556b2afc3",0.17],["Gruul Charm","GK2","RNA Guild Kit",92,0,"uncommon",1,"33c6f53f-538c-4124-84fb-f2045bec3491",0.48],["Burning-Tree Emissary","2X2","Double Masters 2022",189,0,"common",1,"ba327a5e-bd57-4e24-b4b4-062202df30e1",0.24],["Skarrg Guildmage","GTC","Gatecrash",196,0,"uncommon",1,"00f206c0-a8a7-4ca0-b88f-4736c3dac588",0.09],["Friendly Rivalry","LTR","The Lord of the Rings: Tales of Middle-earth",204,0,"uncommon",1,"24076763-88ba-4dee-b548-9c27bd34fdb7",0.16],["Ground Assault","2X2","Double Masters 2022",223,0,"common",1,"e8c61bd1-4bf5-4c38-835d-2249f8e8d5d4",0.28],["Heartwood Crafter // Soul Tether","FRA","Reality Fracture",105,0,"uncommon",1,"910a1f41-17fd-4ab0-9597-7151e79dc760",0.31],["Gruul Turf","ECC","Lorwyn Eclipsed Commander",152,0,"uncommon",1,"f19d2b68-1415-4a0c-bb68-cfacb611c4d2",0.32],["Risen Sanctuary","RTR","Return to Ravnica",190,0,"uncommon",1,"a0b6c136-2bbe-48c1-ac53-2a8221b96936",0.09],["Trostani's Summoner","MIC","Midnight Hunt Commander",156,0,"uncommon",1,"eda757a0-067b-4eb9-badc-d86da5b40305",0.33],["Syr Armont, the Redeemer","WOE","Wilds of Eldraine",214,0,"uncommon",1,"85050609-baf0-430a-ab33-83a6ea6d4741",0.16],["Strength of the Harvest // Haven of the Harvest","MH3","Modern Horizons 3",258,0,"uncommon",1,"a7143aa7-b16d-4e63-910c-6ceec55483f3",0.34],["Woodland Acolyte // Mend the Wilds","WOE","Wilds of Eldraine",241,0,"uncommon",1,"b9f10623-4783-4773-b9c8-a5a2bcfdb5d9",0.29],["Chronicler of Heroes","2X2","Double Masters 2022",193,0,"common",1,"76a60ba3-208c-41c9-a40a-46d3586acdfd",0.04],["Jasmine Boreal of the Seven","DMC","Dominaria United Commander",33,0,"uncommon",1,"c1f5bcc4-3ec7-42ae-8e4b-80a9b9135ff0",0.34],["Eclipsed Kithkin","ECL","Lorwyn Eclipsed",338,0,"uncommon",1,"e40d5d7c-4176-4faa-9701-933307eebb26",0.22],["Vigorbloom Vanguard // Seed Suture","FRA","Reality Fracture",161,0,"uncommon",1,"acefc515-bf97-4dc0-b0f7-ae8ae5a61671",0.2],["Bloodsoaked Insight // Sanguine Morass","MH3","Modern Horizons 3",252,0,"uncommon",1,"0a08e0d2-1e60-47f5-9228-4c11a127089d",0.3],["Rakdos Ringleader","RTR","Return to Ravnica",186,0,"uncommon",1,"6b54fbe8-324a-4066-bed1-dda1dca319fc",0.13],["Pyretic Rebirth","MH3","Modern Horizons 3",200,0,"uncommon",1,"5968f641-48b5-4b97-8072-ddd8073cd4d7",0.18],["Arno Dorian","ACR","Assassin's Creed",139,0,"uncommon",1,"60a97041-4c09-46f2-b979-e4f63c676fb4",0.22],["Toil // Trouble","DGM","Dragon's Maze",133,0,"uncommon",1,"15bb3454-e3bb-4af9-9e93-461e210c26b7",0.1],["Kolaghan Monument","IMA","Iconic Masters",217,0,"uncommon",1,"3efb210e-00a9-470e-ac30-4036a7befd4c",0.29],["Chaos Spewer","ECL","Lorwyn Eclipsed",210,0,"common",1,"b5918fa5-1d13-447b-8838-633b6b61e791",0.16],["Rakdos Guildmage","RVR","Ravnica Remastered",214,0,"uncommon",1,"fb3271d0-4788-4ecc-abf7-95a1e8106d0c",0.17],["Hungry for More","MID","Innistrad: Midnight Hunt",228,0,"uncommon",1,"ce09c0df-d022-4ebf-8f7f-8a913249e75f",0.26],["Rakdos Charm","EOC","Edge of Eternities Commander",125,0,"uncommon",1,"64b67170-1602-4050-80c0-ade2a6cac211",0.41],["Disturbing Mirth","DSK","Duskmourn: House of Horror",212,0,"uncommon",1,"f79b0c5d-6823-439c-a011-8b9bf424bdad",0.12],["Bloodtithe Harvester","INR","Innistrad Remastered",233,0,"uncommon",1,"ae4aec0d-c853-44e6-9f51-cbecf413ea14",0.3],["Akoum Refuge","C19","Commander 2019",226,0,"uncommon",1,"51aecc57-f0cc-4e35-af38-ead25cf8a1b8",0.35],["Dinrova Horror","GK1","GRN Guild Kit",14,0,"uncommon",1,"c0018de2-0646-48fe-8112-11952867c3bb",0.31],["Spellscorn Coven // Take It Back","WOE","Wilds of Eldraine",237,0,"uncommon",1,"8c112f62-6034-4636-a75b-4a45bc916a91",0.2],["Drunau Corpse Trawler","INR","Innistrad Remastered",63,0,"uncommon",1,"11b29a06-c1e1-4d81-ac50-906c94617abe",0.24],["Call of the Nightwing","GK1","GRN Guild Kit",8,0,"uncommon",1,"f299929e-507f-4e94-96ca-49708181a4f7",0.31],["Siren of the Silent Song","BNG","Born of the Gods",155,0,"uncommon",1,"990f4438-aa74-4460-8bac-93480d0bb0dc",0.21],["Fear of Infinity","DSK","Duskmourn: House of Horror",214,0,"uncommon",1,"81756844-c642-406f-842d-35c1e404fec0",0.22],["Horrid Shadowspinner","MH3","Modern Horizons 3",188,0,"uncommon",1,"62b69aaf-0aae-4f6e-a27f-0129882dfe1d",0.27],["Skullsnap Nuisance","DSK","Duskmourn: House of Horror",234,0,"uncommon",1,"0fdcdfd0-8c66-4767-a894-58cf0c6d7e07",0.18],["Sandsteppe Citadel","ECC","Lorwyn Eclipsed Commander",164,0,"uncommon",1,"e7482def-e87e-4a7f-9c18-7859483b2a66",0.26],["Jeskai Brushmaster","TDM","Tarkir: Dragonstorm",195,0,"uncommon",1,"2eb06c36-cf7e-47a9-819e-adfc54284153",0.15],["Fluxcharger","DGM","Dragon's Maze",71,0,"uncommon",4,"7c58f6ed-2544-4b58-8dc0-a0a37b9547e6",0.16],["Bilbo, Retired Burglar","LTR","The Lord of the Rings: Tales of Middle-earth",196,0,"uncommon",2,"527df93e-cc2b-4216-909a-4ada1abcbfd3",0.29],["Spellheart Chimera","DDS","Duel Decks: Mind vs. Might",25,0,"uncommon",3,"8782a7b7-79ca-4e5c-845b-d662222574c0",0.22],["Izzet Charm","RVR","Ravnica Remastered",190,0,"uncommon",2,"15af0592-a1cb-4b1e-b051-dde978939706",0.24],["Blistercoil Weird","RTR","Return to Ravnica",211,0,"uncommon",2,"d2a8e716-ea33-4ae2-9ff8-5e78b0e50459",0.26],["Shroudstomper","DSK","Duskmourn: House of Horror",233,0,"uncommon",2,"53f746bf-0642-48db-835e-27a7fe369fef",0.34],["Sin Collector","GK2","RNA Guild Kit",45,0,"uncommon",2,"b00e9e15-0f1c-4a40-9391-98a14eacc170",0.15],["Gwaihir the Windlord","LTR","The Lord of the Rings: Tales of Middle-earth",210,0,"uncommon",2,"1a42c951-1146-4f49-a690-7d385962b191",0.27],["Gruul War Chant","MM3","Modern Masters 2017",170,0,"uncommon",4,"2003fb65-26ee-481f-a38d-7d3fe55878f3",0.25],["Ghor-Clan Rampager","2XM","Double Masters",198,0,"uncommon",3,"4aae3f29-dde8-4880-b675-75468d53b3f4",0.2],["Join the Dance","INR","Innistrad Remastered",242,0,"uncommon",2,"4a2d360c-1fad-4425-a1ab-5f713c45c7b3",0.27],["Stromkirk Captain","VOC","Crimson Vow Commander",157,0,"uncommon",2,"2f053406-d2e4-4443-81f1-025e3b27c65a",1.56],["Perforating Artist","FDN","Foundations",124,0,"uncommon",2,"72980409-53f0-43c1-965e-06f22e7bb608",0.26],["Showstopper","DGM","Dragon's Maze",102,0,"uncommon",2,"2fd1f68b-3f16-484e-95c9-5cfa8da218c9",0.18],["Rix Maadi Guildmage","RTR","Return to Ravnica",192,0,"uncommon",2,"eb737465-5de8-4015-befe-2bf386da2a89",0.13],["Spike Jester","MM3","Modern Masters 2017",188,0,"common",3,"7f82ff29-2b2c-4e4f-a6ac-e307e2921da0",0.19],["Rakdos Cackler","GK2","RNA Guild Kit",67,0,"uncommon",2,"4b04d7e8-df17-4acb-a763-71d47215fd03",0.28],["Stingerquill Voxmancer // Vicious Verse","FRA","Reality Fracture",151,0,"uncommon",2,"84b1c268-3b8a-41b6-92e3-a2ce0cc3d738",0.24],["Coerced Confession","GTC","Gatecrash",217,0,"uncommon",2,"d76102f1-b05f-472b-81cf-eae424c55638",0.07],["Ghoultree","INR","Innistrad Remastered",198,0,"uncommon",1,"9c99fe73-5fe1-4fcb-8099-73c4a6fd0d35",0.38],["Carnage Wurm","M12","Magic 2012",168,0,"uncommon",1,"c086eb41-3524-4815-97c9-761ba86a30b2",0.15],["Duskdale Wurm","IMA","Iconic Masters",161,0,"common",1,"f6879321-9a61-4c4f-9513-81ad5684c99e",0.09],["Great Oak Guardian","LTC","Tales of Middle-earth Commander",247,0,"uncommon",1,"b5c7f189-ffab-4e45-a66c-f9410f0e8e43",0.26],["Quickbeam, Upstart Ent","LTR","The Lord of the Rings: Tales of Middle-earth",183,0,"uncommon",1,"b889037f-b95f-4756-80aa-04097d2818c3",0.21],["Sylvok Battle-Chair","ONE","Phyrexia: All Will Be One",184,0,"uncommon",1,"71c1a1d0-5616-42f8-a59c-42c1ccd48d26",0.16],["Quakestrider Ceratops","FDN","Foundations",110,0,"uncommon",1,"067f72c2-ead6-4879-bc9d-696c9f87c0b2",0.29],["Way of the Wildspeaker","FRA","Reality Fracture",268,0,"uncommon",1,"a252cb01-537b-4afe-9abc-81a98c4a1439",0.19],["Nessian Demolok","BNG","Born of the Gods",128,0,"uncommon",1,"ee0683b2-8bc2-4c6a-964e-b909693b68c1",0.16],["Nessian Game Warden","JOU","Journey into Nyx",132,0,"uncommon",1,"5099d18d-c8b5-4706-bc93-40d1bb12988d",0.08],["Gobbling Ooze","RTR","Return to Ravnica",126,0,"uncommon",1,"465d8a63-0ced-4aec-be34-2098b72c8af6",0.16],["Challenger Troll","CLU","Ravnica: Clue Edition",159,0,"uncommon",1,"087b6745-0b3c-428c-b5b2-7639fa30f8f5",0.18],["Bellowing Tanglewurm","SOM","Scars of Mirrodin",111,0,"uncommon",1,"44eb3e3a-60ee-4293-a321-daa452d4c70d",0.81],["Hollowhenge Scavenger","ISD","Innistrad",188,0,"uncommon",1,"6c9ff632-0e27-4521-9e9d-5725e618f5dd",0.04],["Agatha's Champion","WOE","Wilds of Eldraine",160,0,"uncommon",1,"92652c41-1239-4299-a486-11fe1a96e912",0.12],["Acid Web Spider","SOM","Scars of Mirrodin",108,0,"uncommon",1,"968a25a5-9ec1-47fa-bf1f-e65eb75fdb00",0.22],["Centaur Battlemaster","2X2","Double Masters 2022",140,0,"uncommon",1,"d190aac9-9ac8-4b54-9f51-d7d1561dc743",0.17],["Needletooth Pack","FDN","Foundations",108,0,"uncommon",1,"993c1679-e02b-44f2-b34e-12fd6b5142e9",0.2],["Overrun","FDN","Foundations",230,0,"uncommon",1,"1d8e9cbb-8bf4-4a48-a58e-79deb3abdf7f",0.35],["Spider Spawning","INR","Innistrad Remastered",216,0,"uncommon",1,"c229cbde-f370-4fef-8765-9773d516324a",0.3],["Howling Galefang","WOE","Wilds of Eldraine",175,0,"uncommon",1,"86311523-d0eb-4db3-b586-8349de9c2d37",0.14],["Karplusan Strider","MM2","Modern Masters 2015",145,0,"uncommon",1,"5eef91c5-3861-40de-9bb7-67f44431428a",0.24],["Sylvan Messenger","ORI","Magic Origins",199,0,"uncommon",1,"95e0550c-d3ad-4bd4-a259-d597991079b1",0.14],["Elvish Regrower","FDN","Foundations",104,0,"uncommon",1,"2694e3cd-26ed-4a10-ae55-fb84d7800253",0.24],["Oakhame Adversary","ELD","Throne of Eldraine",167,0,"uncommon",1,"9fb4e77f-e189-4ad3-9fca-8da04289e396",0.31],["Moon-Vigil Adherents","ECL","Lorwyn Eclipsed",184,0,"uncommon",1,"60621c37-62e1-4261-ae76-3946b4a0cfa3",0.21],["Voice of Many","KHC","Kaldheim Commander",77,0,"uncommon",1,"fccfa714-7fa0-4846-88c9-570f13683aa4",0.26],["Jiang Yanggu, Never Alone","FRA","Reality Fracture",261,0,"uncommon",1,"f5a0bb3e-8119-4739-8684-e61d1d607dcb",0.23],["Monstrous Vortex","MH3","Modern Horizons 3",162,0,"uncommon",1,"162fcdec-bf3c-43ba-9ada-212f7dec5fbd",0.34],["Druid's Familiar","AVR","Avacyn Restored",175,0,"uncommon",1,"1d8c794a-7964-41f0-bc9c-27af7cf87aaa",0.33],["Briarpack Alpha","M14","Magic 2014",166,0,"uncommon",1,"585c11e2-4c30-436c-9dbd-354b154f6def",0.11],["Gift of Strands","LTR","The Lord of the Rings: Tales of Middle-earth",170,0,"uncommon",1,"8c54ee0c-1432-4f20-9a92-2cdfcbab30ac",0.13],["Imperiosaur","TSR","Time Spiral Remastered",211,0,"uncommon",1,"f189aaf0-474a-4701-9bda-e67dc057e347",0.11],["Triumph of the Hordes","NPH","New Phyrexia",123,0,"uncommon",1,"c16b90ff-d256-4ac6-b687-3430b8c80dd7",12.49],["Make a Wish","ISD","Innistrad",192,0,"uncommon",1,"d0a8508d-25a7-4fb2-8aa3-349275f80c42",0.13],["Bristlebane Outrider","ECL","Lorwyn Eclipsed",169,0,"uncommon",1,"38b17a3c-4457-47e3-986e-ff0b94c41b1a",0.12],["Seedship Agrarian","EOE","Edge of Eternities",204,0,"uncommon",1,"2fc7946d-37b0-4dc8-9daa-8d2204d8e4d2",0.26],["Luminollusk","ECL","Lorwyn Eclipsed",179,0,"uncommon",1,"3d591e66-4bf9-47e7-bcef-57769ec3edc6",0.13],["Noble Quarry","C15","Commander 2015",193,0,"uncommon",1,"d5fd4994-afce-496b-8682-0fee208e68ec",0.26],["Hazardroot Herbalist","BLB","Bloomburrow",174,0,"uncommon",1,"e2882982-b3a3-4762-a550-6b82db1038e8",0.18],["Splinterfright","INR","Innistrad Remastered",217,0,"uncommon",1,"d4d5aafc-b1a6-4387-b9bf-59fca23fff94",0.3],["Under the Skin","DSK","Duskmourn: House of Horror",203,0,"uncommon",1,"0aaf1ad3-00ad-48ec-a71f-812649d55e14",0.17],["Cached Defenses","FRF","Fate Reforged",126,0,"uncommon",1,"41ad36cf-5f29-41c4-b2a3-6b8e8c0c493f",0.13],["Lambholt Elder // Silverpelt Werewolf","DKA","Dark Ascension",122,0,"uncommon",1,"932d753d-9584-4ad8-9a5e-a3524184f961",0.25],["Budoka Pupil // Ichiga, Who Topples Oaks","BOK","Betrayers of Kamigawa",122,0,"uncommon",1,"73636ca0-2309-4bb3-9300-8bd0c0bb5b31",0.08],["Oak Street Innkeeper","RTR","Return to Ravnica",131,0,"uncommon",1,"08274d1b-52b7-46c1-8f93-7631d2e21def",0.17],["Greenweaver Druid","DPA","Duels of the Planeswalkers",68,0,"uncommon",1,"fe76a404-1907-484e-8192-11dfa9389092",0.58],["Colossal Majesty","J22","Jumpstart 2022",87,0,"uncommon",1,"4fd1764f-9b62-4977-9fee-1266f0ea01aa",1.43],["Bridgeworks Battle // Tanglespan Bridgeworks","MH3","Modern Horizons 3",249,0,"uncommon",1,"ebef3db0-2b58-4581-a79c-fbca9a059e63",1.27],["Fyndhorn Elder","ICE","Ice Age",243,0,"uncommon",1,"fca8aa11-f7cb-4f88-a041-30098579f1d2",0.43],["Viridian Shaman","DDU","Duel Decks: Elves vs. Inventors",25,0,"uncommon",1,"bed8b8aa-2c1f-4a5b-af6e-16802b3b9453",0.21],["Blanchwood Armor","9ED","Ninth Edition",232,0,"uncommon",1,"22e558f1-74ef-4d16-8135-2a8dc0c58fe9",0.25],["Vow of Wildness","CMR","Commander Legends",262,0,"uncommon",1,"764fa7f1-b92b-42cc-983e-e0b5457369a7",0.31],["Mirkwood Pathmaker","HOB","The Hobbit",129,0,"uncommon",1,"50fbedc0-bc66-4ffb-87f6-a2df69995091",0.19],["Howlpack Resurgence","INR","Innistrad Remastered",204,0,"uncommon",1,"c0dc4c08-ed18-454b-b061-8901c253005c",0.33],["Awakener Druid","M11","Magic 2011",163,0,"uncommon",1,"e5ea3786-c64c-4e36-8b3b-19da0c0b46d3",0.2],["Mwonvuli Beast Tracker","M13","Magic 2013",177,0,"uncommon",1,"0034d32c-cc82-48d7-a913-d58cc3d3afeb",0.29],["Entish Restoration","LTR","The Lord of the Rings: Tales of Middle-earth",163,0,"uncommon",1,"cd4dbf80-187b-40e3-9e0b-526f78d9a34e",2.16],["Hindervines","MOC","March of the Machine Commander",301,0,"uncommon",1,"bab0c821-965c-4086-b787-f30a6da86ff8",0.23],["Lure","IMA","Iconic Masters",175,0,"uncommon",1,"72c8336d-54cf-45af-a9ef-a1428facf91b",0.19],["Reviving Melody","JOU","Journey into Nyx",138,0,"uncommon",1,"49b152cc-d39f-470e-8b62-e4a833db7b88",0.25],["Roar of Challenge","KTK","Khans of Tarkir",145,0,"uncommon",1,"83456f8f-8a1a-403c-816b-25e454ba1edf",0.25],["Miming Slime","GK2","RNA Guild Kit",113,0,"common",1,"6b4b68fa-6b82-470a-a2ca-10aba024c914",0.22],["Blanchwood Armor","FDN","Foundations",213,0,"uncommon",1,"1fd7ec1a-dafa-42ca-bc25-f6848fb03f60",0.25],["Vinebred Brawler","ECL","Lorwyn Eclipsed",201,0,"uncommon",1,"63c573fe-e74c-48ca-ad05-92f37dc466f1",0.15],["Strength from the Fallen","JOU","Journey into Nyx",143,0,"uncommon",1,"c76b3a8e-3cbb-47c4-9535-dfdeece7ee02",0.22],["Hunter's Talent","BLB","Bloomburrow",179,0,"uncommon",1,"e9a31863-9649-4a4f-99e4-c93729938bd7",0.31],["Bower Passage","AVR","Avacyn Restored",170,0,"uncommon",1,"b9f0048f-aaa0-4597-b898-ee754d0bbe4b",0.65],["Dense Canopy","SOK","Saviors of Kamigawa",125,0,"uncommon",1,"9d1480d4-51f8-4233-874c-94502726fe0d",0.25],["Skyreaping","BNG","Born of the Gods",140,0,"uncommon",1,"40eb76b3-b527-4ed8-8ce3-d3de48562b6e",0.2],["Meriadoc Brandybuck","LTR","The Lord of the Rings: Tales of Middle-earth",177,0,"uncommon",1,"885a3277-ef10-4dcf-ac63-eb8971cd627c",0.25],["Voracious Wurm","M14","Magic 2014",200,0,"uncommon",1,"da15100b-2934-438c-9917-84ad8bdc4181",0.17],["Traveling Botanist","TDM","Tarkir: Dragonstorm",164,0,"uncommon",1,"890b11b4-777a-4f1e-8c4d-21c5ebbfb0a2",0.25],["Collective Resistance","MH3","Modern Horizons 3",147,0,"uncommon",1,"f260bd08-68b6-44f4-ace9-e298cb13d82e",1.43],["Noose Constrictor","INR","Innistrad Remastered",210,0,"uncommon",1,"b432cccb-4291-46f3-a171-919adf8b95eb",0.22],["Graceful Takedown","WOE","Wilds of Eldraine",171,0,"uncommon",1,"83edf626-ed34-417f-818d-597ecf439167",0.07],["Tracker's Instincts","DKA","Dark Ascension",128,0,"uncommon",1,"59960387-3adf-4b9a-b0e6-c441579f7388",0.2],["Dundoolin Weaver","ECL","Lorwyn Eclipsed",175,0,"uncommon",1,"2260912b-4dfb-49dd-bf95-060d44333645",0.22],["Thoughtweft Charge","ECL","Lorwyn Eclipsed",198,0,"uncommon",1,"19cfc015-b6d5-4918-99a7-990209e77441",0.11],["Shimmerwilds Growth","ECL","Lorwyn Eclipsed",194,0,"uncommon",1,"c122719c-f0d1-4170-a0d1-d62172df1d21",0.25],["Experiment One","RVR","Ravnica Remastered",137,0,"uncommon",1,"3b551403-47dd-4c2b-95c8-0e2e674d6fcf",0.19],["Autumn's Veil","M12","Magic 2012",164,0,"uncommon",1,"b911fee0-c30b-4d68-a9e2-61c40ece68b0",0.54],["Malamet Battle Glyph","LCI","The Lost Caverns of Ixalan",198,0,"uncommon",1,"2259f959-ca97-4df9-8d50-0532090fb967",0.23],["Mild-Mannered Librarian","FDN","Foundations",228,0,"uncommon",1,"5389663a-fe25-41b9-8c92-1f4d7721ffc2",0.13],["Hunt the Hunter","THS","Theros",159,0,"uncommon",1,"61d4899f-11a4-4a2c-a499-3a447b792f86",0.15],["Groundskeeper","EOC","Edge of Eternities Commander",97,0,"uncommon",1,"30444f88-5a7e-46bc-ab0c-17e62fae2457",0.17],["Quirion Ranger","MH2","Modern Horizons 2",285,0,"uncommon",1,"320fdf89-e158-41c5-b0bf-fee9dec36a75",2.33],["Rope","MKM","Murders at Karlov Manor",173,0,"uncommon",1,"6881946c-5036-4d9f-926f-932c9a592aff",0.12],["Skemfar Elderhall","KHM","Kaldheim",268,0,"uncommon",1,"82c2a0f7-0f53-4627-8be8-227fde331a69",0.31],["Ghalta the Unstoppable","FRA","Reality Fracture",260,0,"uncommon",2,"1d535b5f-c916-4f16-89a7-9477578826d2",0.37],["Battering Wurm","GPT","Guildpact",79,0,"uncommon",2,"5a0fb683-2e9b-465c-9fb5-2eb334c2739a",0.11],["Ruric Thar, Magecrusher","FRA","Reality Fracture",265,0,"uncommon",2,"eed83302-dc2c-45f4-a4bd-af9da51edef5",0.2],["Vorstclaw","M20","Core Set 2020",201,0,"common",2,"79719ed0-468d-4946-8dfc-fb7e2b2e305e",0.25],["Baloth Woodcrasher","C18","Commander 2018",130,0,"uncommon",2,"5c15f211-2c59-4b02-ac91-955f695816ec",0.29],["Enlarge","2XM","Double Masters",166,0,"uncommon",3,"0f4e699f-5f2c-4487-8a40-42be6f561631",0.3],["Garruk's Packleader","BLC","Bloomburrow Commander",218,0,"uncommon",2,"109dee37-5de5-40fa-9405-8645be6c5076",0.33],["Acidic Slime","M3C","Modern Horizons 3 Commander",218,0,"uncommon",2,"7dfeb1d1-7b2d-4235-902f-22a62af5dc0f",0.3],["Reach of Branches","MMA","Modern Masters",158,0,"uncommon",2,"034215f1-62f5-49ce-a818-44577138b508",0.34],["Celeborn the Wise","LTR","The Lord of the Rings: Tales of Middle-earth",156,0,"uncommon",2,"2daf449a-5f3e-44fd-968e-55d8517ae797",0.15],["Lumberknot","INR","Innistrad Remastered",206,0,"uncommon",3,"07eae396-ee57-485e-8360-962a1310ca31",0.29],["Galion, Elvenking's Butler","HOB","The Hobbit",125,0,"uncommon",3,"985bd676-58c4-42c7-a570-1b413e9aa94c",0.17],["Roaring Primadox","M15","Magic 2015",196,0,"uncommon",2,"49f985df-177f-4535-b681-f9bc74045b39",0.18],["Fungal Sprouting","M13","Magic 2013",173,0,"uncommon",2,"97413ae3-037e-4786-85a3-e92604acd771",0.66],["Trickster's Elk","MH3","Modern Horizons 3",175,0,"uncommon",2,"812af562-853a-48a3-b428-ad891c54be5c",0.35],["Shrill Howler // Howling Chorus","INR","Innistrad Remastered",214,0,"uncommon",2,"e414e208-2e90-4b0d-b107-7a387b3f779b",0.3],["Gloomwidow","SOI","Shadows over Innistrad",206,0,"uncommon",2,"ee04dfd8-e704-46d7-bdf8-b0b2ee747a49",0.14],["Flinthoof Boar","EMA","Eternal Masters",166,0,"uncommon",2,"873be98f-e263-4e84-afa0-1e329aa47550",0.19],["Revive","MM3","Modern Masters 2017",133,0,"common",2,"1b365778-1678-4c1f-ae32-7671a1429a3e",0.21],["Strangleroot Geist","DKA","Dark Ascension",127,0,"uncommon",2,"bf1fb137-205c-480f-b6dc-dfa137793ae3",0.21],["Rancor","2X2","Double Masters 2022",156,0,"uncommon",2,"86d6b411-4a31-4bfc-8dd6-e19f553bb29b",1.82],["Oxidda Finisher","ONE","Phyrexia: All Will Be One",143,0,"uncommon",1,"7177431e-5cc4-4ecd-8848-f51903289072",0.2],["Into the Maw of Hell","ISD","Innistrad",150,0,"uncommon",1,"5d188d9b-7a12-4eaf-855b-af4f0204dc5a",0.23],["Galvanizing Sawship","EOE","Edge of Eternities",136,0,"uncommon",1,"5bbce9fb-401f-4e78-acd5-9d3b506687fd",0.22],["Ripscale Predator","CLU","Ravnica: Clue Edition",146,0,"common",1,"41578103-04a3-40eb-80b5-cdb5f2ecc297",0.16],["Ogre Geargrabber","SOM","Scars of Mirrodin",99,0,"uncommon",1,"f0f6e2c3-0e0d-47ff-9d92-afc86a8c8aac",0.06],["Pinnacle Monk // Mystic Peak","MH3","Modern Horizons 3",246,0,"uncommon",1,"24d4f26e-7f96-4b38-867e-4fac819b2679",2.36],["Burning-Yard Trainer","ELD","Throne of Eldraine",117,0,"uncommon",1,"17755d1b-3a56-4362-a534-85b35ceb1802",0.12],["Rampaging Ceratops","LCI","The Lost Caverns of Ixalan",162,0,"uncommon",1,"8bab3f8f-cb06-466d-a35d-0b5e1a2b524c",0.16],["Éomer of the Riddermark","LTR","The Lord of the Rings: Tales of Middle-earth",121,0,"uncommon",1,"d920fcaf-4988-4186-962d-cdda25d79e7b",0.22],["Jiang Yanggu, Alone","FRA","Reality Fracture",246,0,"uncommon",1,"e8c1ce21-b77d-40bf-9ed1-478604e71f5f",0.24],["Act of Aggression","C15","Commander 2015",141,0,"uncommon",1,"8d34c3aa-7d74-4a8b-898c-cb62b1f05989",0.32],["Battle Sliver","M14","Magic 2014",128,0,"uncommon",1,"68490b8c-e9d1-4f5c-9001-750be0e0569f",0.34],["Breaching Dragonstorm","TDM","Tarkir: Dragonstorm",101,0,"uncommon",1,"e2c2a069-7553-4879-abfb-b2aa3349e4b8",0.23],["Overpowering Attack","ACR","Assassin's Creed",37,0,"uncommon",1,"e4ad338e-88ee-4919-aec4-320071a7cfb5",1.32],["Smoldering Werewolf // Erupting Dreadwolf","INR","Innistrad Remastered",171,0,"uncommon",1,"e724d16c-d44b-4b8f-9616-64923e2cdeb2",0.23],["Shiv's Embrace","M14","Magic 2014",153,0,"uncommon",1,"8a42fcd6-32ce-4a20-af4d-83bd32a7ed3e",0.25],["Overblaze","BOK","Betrayers of Kamigawa",114,0,"uncommon",1,"97040b82-ad9e-4c06-a9ac-74d0688279f9",0.33],["Vigilante Justice","C20","Commander 2020",164,0,"uncommon",1,"10474e9b-213c-4134-ad49-e3d17d7e0a8f",0.17],["Brambleguard Captain","BLB","Bloomburrow",127,0,"uncommon",1,"e200b8bf-f2f3-4157-8e04-02baf07a963e",0.2],["Hidetsugu's Second Rite","FDN","Foundations",202,0,"uncommon",1,"609421da-8d89-4365-b18b-778832d91482",0.14],["Bloodshot Trainee","2XM","Double Masters",119,0,"uncommon",1,"779a130b-1d23-4a20-9914-dbdc2268ae3b",0.21],["Havengul Vampire","CN2","Conspiracy: Take the Crown",164,0,"uncommon",1,"89a4094d-fbcf-42e6-87ef-c722efc4d371",0.19],["Cinder Elemental","GTC","Gatecrash",87,0,"uncommon",1,"8bbf10ce-69e0-4984-91a3-f65df919830d",0.13],["Shivan Sand-Mage","TSR","Time Spiral Remastered",189,0,"uncommon",1,"d21beb25-09a4-4d7f-84e3-87178e1721eb",0.17],["Geological Appraiser","LCI","The Lost Caverns of Ixalan",150,0,"uncommon",1,"7f9c1a82-695b-4df2-8e51-2d71a62e7baf",0.22],["Arni, Renowned Champion","FRA","Reality Fracture",243,0,"uncommon",1,"bd8db649-1dba-457d-8327-e1f1da1aab36",0.16],["Fanatic of Mogis","THS","Theros",121,0,"uncommon",1,"581eaadb-442b-40c9-b8f9-9e19d5eba824",0.37],["Calamitous Cave-In","LCI","The Lost Caverns of Ixalan",139,0,"uncommon",1,"8341ddd9-aac1-4773-b8ce-51e35f696263",0.1],["Kindle the Inner Flame","ECL","Lorwyn Eclipsed",147,0,"uncommon",1,"9a2adcea-f6b1-4611-b8b8-f19fdee2c571",0.19],["Relentless Rohirrim","LTR","The Lord of the Rings: Tales of Middle-earth",144,0,"common",1,"21b7606a-6a4c-4bf0-b311-1883383161d2",0.15],["Rakdos Pit Dragon","RVR","Ravnica Remastered",120,0,"uncommon",1,"6afb2e91-a864-4f77-9da5-2bae3f66a8a6",0.21],["Strongbox Raider","FDN","Foundations",96,0,"uncommon",1,"b2223eb8-59f9-489b-a3f3-b6496218cb79",0.11],["Sokenzan Renegade","SOK","Saviors of Kamigawa",114,0,"uncommon",1,"1e9b3164-3de2-4b25-88d0-2dffee32148a",0.28],["Painter's Studio // Defaced Gallery","DSK","Duskmourn: House of Horror",147,0,"uncommon",1,"e96901eb-5b57-43f4-a7b1-ae3b809bc36e",0.18],["Dragon Egg","CMR","Commander Legends",173,0,"common",1,"300761b6-9943-4251-9b1a-96a940f3334b",0.31],["Molten Birth","UMA","Ultimate Masters",140,0,"common",1,"fd7ea3f3-900e-4dc5-ad83-1d5c5320d031",0.32],["Burning Vengeance","INR","Innistrad Remastered",147,0,"uncommon",1,"389c7393-a10d-48c0-8b64-73faa8f7d3d4",0.3],["Stensia Masquerade","INR","Innistrad Remastered",172,0,"uncommon",1,"faaf031f-2c77-4248-8a29-f47e64773cfd",0.31],["Unsparing Boltcaster","TDM","Tarkir: Dragonstorm",130,0,"uncommon",1,"204f5e5e-d87f-4aee-84e3-28afe8e21591",0.12],["Grishnákh, Brash Instigator","LTR","The Lord of the Rings: Tales of Middle-earth",134,0,"uncommon",1,"6385e769-f805-499d-9f47-494533362152",0.17],["Cryoclasm","10E","Tenth Edition",195,0,"uncommon",1,"cf386439-0f68-454f-993b-d55dcc989d81",0.31],["Rising of the Day","LTR","The Lord of the Rings: Tales of Middle-earth",145,0,"uncommon",1,"d4fbcac6-8ac9-44a8-9d1a-03d0799ac253",0.51],["Arms Dealer","M13","Magic 2013",120,0,"uncommon",1,"910d3c33-8cda-487b-8b44-87a9d06d6749",0.31],["Guttersnipe","RVR","Ravnica Remastered",110,0,"uncommon",1,"48eeb13e-26f8-4fc7-8850-d38790317ea4",0.35],["Firespitter Whelp","FDN","Foundations",197,0,"uncommon",1,"4b3a4c7d-3126-4bde-9dca-cb6a1e2f37c9",0.24],["Rising of the Day","LTR","The Lord of the Rings: Tales of Middle-earth",427,0,"uncommon",1,"7a06a653-eca1-4fee-add5-45d2594885c3",0.48],["Overwhelming Surge","TDM","Tarkir: Dragonstorm",115,0,"uncommon",1,"bd7af85f-354e-468a-990b-bd774e68240f",0.2],["Fiery Annihilation","FDN","Foundations",86,0,"uncommon",1,"54fe00aa-d284-48f9-b5a2-1bd4c5fa8e58",0.2],["Uncaged Fury","INR","Innistrad Remastered",177,0,"uncommon",1,"de8f4d5b-ea3c-4d01-b163-2fcfb1bcca8e",0.16],["Ghost-Lit Raider","SOK","Saviors of Kamigawa",99,0,"uncommon",1,"4280a08a-90fe-445e-b49d-1a3b13d3c6e9",0.2],["Coastline Marauders","CMR","Commander Legends",168,0,"uncommon",1,"7a47e6bc-422a-4627-b21e-5a042193bed0",0.3],["Bombur, Gentle Dreamer","HOB","The Hobbit",88,0,"uncommon",1,"63c317e7-432c-4817-8db4-3670a1d84be3",0.18],["Seismic Rupture","FDN","Foundations",205,0,"uncommon",1,"2519a51a-26a0-4884-9ba8-9db135c9ee49",0.14],["Stormcaller of Keranos","BNG","Born of the Gods",112,0,"uncommon",1,"d397bdc3-a866-45be-8740-185d9ccf29c4",0.14],["Crimson Mage","A25","Masters 25",127,0,"common",1,"52f544fa-170f-4da4-bd28-72f713a045ba",0.13],["Torch Fiend","M15","Magic 2015",166,0,"common",1,"3ea18c3f-0ca3-44ba-b8f5-87ce1797c58f",0.06],["Firefist Striker","CLU","Ravnica: Clue Edition",134,0,"uncommon",1,"6a6912e1-ec9a-4db7-a0fc-2cb91f740b80",0.1],["Goblin Negotiation","FDN","Foundations",88,0,"uncommon",1,"f2016585-e26c-4d13-b09f-af6383c192f7",0.31],["Crackling Perimeter","GTC","Gatecrash",88,0,"uncommon",1,"3323c86c-73bd-4e23-9f80-54bf5c1dd0bc",0.23],["Young Pyromancer","OTC","Outlaws of Thunder Junction Commander",185,0,"uncommon",1,"f233a41f-106b-4bf0-a599-7ac5d83cfed5",0.3],["Burning Oil","DKA","Dark Ascension",84,0,"uncommon",1,"47773da8-afe4-43e1-8355-6ab51451ee00",0.2],["Betrayer's Bargain","DSK","Duskmourn: House of Horror",126,0,"uncommon",1,"7956ae00-8f0c-48f0-8110-19ff53863876",0.15],["Cathartic Reunion","ACR","Assassin's Creed",94,0,"uncommon",1,"55aaab05-db3b-4317-ae32-553c76f6bade",0.29],["Bothersome Noisemaker","HOB","The Hobbit",89,0,"uncommon",1,"cb25b11a-6bf5-4a9a-b60f-d4dcac3816d6",0.29],["Hoarder's Overflow","BLB","Bloomburrow",141,0,"uncommon",1,"c2ed5079-07b4-4575-a2c8-5f0cbff888c3",0.21],["Unstable Amulet","MH3","Modern Horizons 3",142,0,"uncommon",1,"9d9949f5-8d6c-4ea9-b203-99e8a57a6c60",0.2],["Obsessive Astronomer","MID","Innistrad: Midnight Hunt",152,0,"uncommon",1,"4f6e0cb6-283b-448e-89c6-8b6e8e21e38b",0.14],["Warren Torchmaster","ECL","Lorwyn Eclipsed",163,0,"uncommon",1,"8f067a14-6667-4acf-b33d-e1149188a84d",0.27],["Flamebraider","ECL","Lorwyn Eclipsed",139,0,"uncommon",1,"b8aa428c-5a77-444f-b75e-a113e46fe4e0",0.18],["Arc Trail","PCA","Planechase Anthology",39,0,"uncommon",1,"56306d90-7f58-4559-954c-f8ca43d04be8",0.26],["Circle of Flame","M15","Magic 2015",135,0,"uncommon",1,"96cbfd4a-ac95-4191-84f9-199a9e1807c4",0.17],["Sear","ECL","Lorwyn Eclipsed",154,0,"uncommon",1,"aeb4612c-758b-4492-ba03-eb6741b4176e",0.32],["Spite of Mogis","JOU","Journey into Nyx",113,0,"uncommon",1,"5676d255-707e-4621-a0df-3305f999f124",0.21],["Rohirrim Lancer","LTR","The Lord of the Rings: Tales of Middle-earth",146,0,"common",1,"2f506f9f-4c0d-44e8-9f81-8403d808d0e4",0.14],["Heartfire Hero","BLB","Bloomburrow",138,0,"uncommon",1,"48ace959-66b2-40c8-9bff-fd7ed9c99a82",0.32],["Reckless Waif // Merciless Predator","ISD","Innistrad",159,0,"uncommon",1,"028aeebc-4073-4595-94da-02f9f96ea148",0.27],["Fleeting Effigy","TDM","Tarkir: Dragonstorm",108,0,"uncommon",1,"1971fd6c-0a1c-41b2-93a6-886a176fbb73",0.21],["Lightning Axe","INR","Innistrad Remastered",162,0,"uncommon",1,"90911c79-24c3-4566-b72c-02ccde083f1b",0.27],["Barrage of Expendables","M14","Magic 2014",127,0,"uncommon",1,"b9e0912d-b4b9-497c-bce7-ed80b79bab32",0.28],["Escape Velocity","THB","Theros Beyond Death",132,0,"uncommon",1,"90c2a3da-2458-4921-8574-9eb9d5925ae8",0.2],["Demonfire","RVR","Ravnica Remastered",107,0,"uncommon",1,"f39020e2-86cf-4b7c-bcb8-23207291f9ee",0.29],["Claim the Firstborn","ELD","Throne of Eldraine",118,0,"uncommon",1,"feaf1e6c-c7d9-4ac7-9aeb-c4b5d61548ec",0.22],["Fear, Fire, Foes!","LTR","The Lord of the Rings: Tales of Middle-earth",125,0,"uncommon",1,"37be98a4-0cba-46b4-be93-a9805fe77160",0.22],["Thunderous Wrath","MM3","Modern Masters 2017",113,0,"common",2,"804458a2-5376-462d-a2cd-fa596750c0aa",0.21],["Gang of Devils","CN2","Conspiracy: Take the Crown",158,0,"uncommon",2,"4478151a-5c4e-49dc-9405-2481395ed28f",0.07],["Cleaver Riot","DDT","Duel Decks: Merfolk vs. Goblins",36,0,"uncommon",2,"93930452-af89-42b3-b668-5d4f0a607d4f",0.12],["Mindclaw Shaman","M13","Magic 2013",142,0,"uncommon",3,"0f342fe9-aa73-4222-b908-d4035b5746be",0.27],["Scourge of Geier Reach","ISD","Innistrad",162,0,"uncommon",2,"e0c25932-96e7-4ae5-b544-8780f92d0be7",0.07],["Dragon Trainer","FDN","Foundations",84,0,"uncommon",2,"91bd75a1-cb54-4e38-9ce1-e8f32a73c6eb",0.22],["Goblin Rally","GK1","GRN Guild Kit",30,0,"uncommon",2,"38b8c2a5-d84f-44c7-85dd-50c78f8b47da",0.33],["Gimli, Counter of Kills","LTR","The Lord of the Rings: Tales of Middle-earth",129,0,"uncommon",2,"28b41c48-0715-49d9-98e5-e82b706da816",0.26],["Furnace Whelp","CMA","Commander Anthology",83,0,"uncommon",2,"ff17616f-1e6c-4a2b-a6ae-04a5d1454995",0.4],["Mark for Death","GTC","Gatecrash",99,0,"uncommon",2,"45498dbd-a512-4299-800b-06c15a4fd94e",0.14],["Curator of Sun's Creation","LCI","The Lost Caverns of Ixalan",141,0,"uncommon",2,"a144d0b3-678d-4f4c-a9b0-22af19f5cf9f",0.22],["Skirsdag Cultist","MM3","Modern Masters 2017",112,0,"uncommon",2,"d8634068-0ada-4913-8246-c9ac7e9dbde3",0.05],["Belligerent of the Ball","WOE","Wilds of Eldraine",120,0,"uncommon",2,"6658398a-46a5-4f41-9b1b-4a47f2822cf8",0.06],["Pyreheart Wolf","DKA","Dark Ascension",101,0,"uncommon",3,"9722f20c-e0d9-4165-8cd5-4abadc5378eb",0.36],["Flames of the Firebrand","M14","Magic 2014",139,0,"uncommon",6,"aba659ce-b15c-4af9-bba1-0fb79b23f444",0.14],["Rush of Blood","AVR","Avacyn Restored",154,0,"uncommon",2,"a2884824-d138-47f2-913b-32cd475e9584",0.32],["Rolling Temblor","C19","Commander 2019",151,0,"uncommon",2,"2a1ec927-b645-4285-8765-02c0ac104ae1",0.21],["Skullcrack","RVR","Ravnica Remastered",125,0,"uncommon",2,"7f399983-d70a-4cf3-b76e-bb0c472e7c69",0.16],["Lightning Mauler","INR","Innistrad Remastered",163,0,"uncommon",2,"ea45c4fe-6e39-4c5f-b7f0-233dee1eff90",0.24],["Volcanic Geyser","M21","Core Set 2021",171,0,"uncommon",2,"7e22c791-6ef9-4f13-a14d-4f795f48bb1c",0.21],["Boltwave","FDN","Foundations",79,0,"uncommon",2,"8d1ec351-5e70-4eb2-b590-6bff94ef8178",2.66]];
 // [name, setCode, setName, collectorNo, foil(0/1), rarity, qty, scryfallId, paidUSD]
-let RATE = 1.427, RATE_LIVE = false, LIVE_PRICES = false;
-const RARITY_ORDER = {common:0, uncommon:1, rare:2, mythic:3};
+let RATE = 1.427, RATE_LIVE = false, LIVE_PRICES = false, DATA_STATE = 'loading', DATA_OK = 0;
+const RARITIES = ['common','uncommon','rare','mythic'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uniq = a => [...new Set(a)];
+const lc = s => String(s).toLowerCase();
+
 const rows = RAW.map(r => ({
-  name:r[0], setCode:r[1], setName:r[2], num:r[3], foil:!!r[4], rarity:r[5], qty:r[6], id:r[7],
-  paidUsd:r[8], marketUsd:null
+  name:r[0], nm:lc(r[0]), setCode:r[1], setName:r[2], num:r[3], foil:!!r[4], rarity:r[5], qty:r[6], id:r[7],
+  paidUsd:r[8], marketUsd:null, has:false, t:''
 }));
 
+const priceUsd = r => r.marketUsd != null ? r.marketUsd : r.paidUsd;
+const priceCad = r => priceUsd(r) * RATE;
+const money = n => n == null || isNaN(n) ? '–' : 'C$' + n.toFixed(2);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* ---------------- Scryfall-style search ---------------- */
+const COLOR_NAMES = {white:['w'],blue:['u'],black:['b'],red:['r'],green:['g']};
+const GUILDS = {azorius:'wu',dimir:'ub',rakdos:'br',gruul:'rg',selesnya:'gw',orzhov:'wb',izzet:'ur',golgari:'bg',boros:'rw',simic:'gu',
+  bant:'gwu',esper:'wub',grixis:'ubr',jund:'brg',naya:'rgw',abzan:'wbg',jeskai:'urw',sultai:'bgu',mardu:'rwb',temur:'gur',
+  chaos:'ubrg',aggression:'brgw',altruism:'rgwu',growth:'gwub',artifice:'wubr'};
+
+function tokenize(s){
+  const toks=[]; let i=0;
+  while(i<s.length){
+    const ch=s[i];
+    if(/\s/.test(ch)){ i++; continue; }
+    if(ch==='('){ toks.push({t:'('}); i++; continue; }
+    if(ch===')'){ toks.push({t:')'}); i++; continue; }
+    if(ch==='-' && s[i+1]==='('){ toks.push({t:'neg'}); i++; continue; }
+    let w='';
+    while(i<s.length && !/\s/.test(s[i]) && s[i]!==')'){
+      if(s[i]==='"'){ let j=s.indexOf('"',i+1); if(j<0) j=s.length-1; w+=s.slice(i,j+1); i=j+1; continue; }
+      if(s[i]==='/' && /[:=<>]$/.test(w)){ let j=i+1; while(j<s.length && !(s[j]==='/' && s[j-1]!=='\\')) j++; w+=s.slice(i,j+1); i=j+1; continue; }
+      w+=s[i]; i++;
+    }
+    toks.push({t:'w',v:w});
+  }
+  return toks;
+}
+function unq(v){ v=String(v); if(v[0]==='"'){ v=v.slice(1); if(v.endsWith('"')) v=v.slice(0,-1); } return v; }
+function mkText(raw){
+  if(raw.length>1 && raw[0]==='/' && raw.endsWith('/')){
+    try{ return {re:new RegExp(raw.slice(1,-1),'i')}; }catch(e){ return null; }
+  }
+  return {s:lc(unq(raw))};
+}
+function cmpN(a,op,b){
+  if(a==null||b==null||isNaN(a)||isNaN(b)) return false;
+  switch(op){case ':':case '=':return a===b;case '!=':return a!==b;case '<':return a<b;case '>':return a>b;case '<=':return a<=b;case '>=':return a>=b;}
+  return false;
+}
+function strPred(get, op, raw, opts={}){
+  const tx=mkText(raw); if(!tx) return null;
+  return r => {
+    if(opts.data && !r.has) return false;
+    const h=get(r); if(h==null) return false;
+    let hit;
+    if(tx.re) hit=tx.re.test(h);
+    else {
+      const needle = opts.tilde ? tx.s.replace(/~/g, r.nm) : tx.s;
+      hit = op==='=' ? h===needle : h.includes(needle);
+    }
+    return op==='!=' ? !hit : hit;
+  };
+}
+function listPred(get, op, raw){
+  const tx=mkText(raw); if(!tx) return null;
+  return r => {
+    if(!r.has) return false;
+    const a=get(r)||[];
+    const hit = tx.re ? a.some(x=>tx.re.test(x)) : a.includes(tx.s);
+    return op==='!=' ? !hit : hit;
+  };
+}
+function parseColorVal(raw){
+  const v=lc(unq(raw));
+  if(v==='c'||v==='colorless') return {none:true,set:[]};
+  if(v==='m'||v==='multicolor') return {multi:true,set:[]};
+  if(COLOR_NAMES[v]) return {set:COLOR_NAMES[v]};
+  if(GUILDS[v]) return {set:GUILDS[v].split('')};
+  if(/^[wubrg]+$/.test(v)) return {set:uniq(v.split(''))};
+  return null;
+}
+function colorPred(get, op, raw, isId){
+  const q=parseColorVal(raw); if(!q) return null;
+  if(isId && op===':') op='<=';
+  const B=q.set;
+  return r => {
+    if(!r.has) return false;
+    const A=get(r);
+    if(q.multi) return op==='!=' ? A.length<2 : A.length>=2;
+    if(q.none && (op===':'||op==='='||op==='>=')) return A.length===0;
+    if(q.none && op==='!=') return A.length>0;
+    const sup=B.every(x=>A.includes(x)), sub=A.every(x=>B.includes(x)), eq=sup&&sub;
+    switch(op){case ':':case '>=':return sup;case '=':return eq;case '!=':return !eq;case '<=':return sub;case '<':return sub&&!eq;case '>':return sup&&!eq;}
+    return false;
+  };
+}
+const NUM_FIELDS = {
+  cmc:r=>r.cmc, mv:r=>r.cmc, manavalue:r=>r.cmc,
+  pow:r=>r.pw, power:r=>r.pw, tou:r=>r.tg, toughness:r=>r.tg, loy:r=>r.loy, loyalty:r=>r.loy,
+  qty:r=>r.qty, quantity:r=>r.qty, usd:r=>priceUsd(r), cad:r=>priceCad(r), price:r=>priceCad(r), year:r=>r.year
+};
+const CROSS = {cmc:1,mv:1,manavalue:1,pow:1,power:1,tou:1,toughness:1,loy:1,loyalty:1};
+const IS_FLAGS = {
+  foil:r=>r.foil, nonfoil:r=>!r.foil, dupe:r=>r.qty>1, duplicate:r=>r.qty>1,
+  multicolor:r=>r.has&&r.cols.length>1, colorless:r=>r.has&&r.cols.length===0,
+  dfc:r=>r.has&&/transform|modal_dfc|reversible|double_faced/.test(r.layout),
+  vanilla:r=>r.has&&/creature/.test(r.tl)&&r.ot.trim()==='',
+  permanent:r=>r.has&&!/instant|sorcery/.test(r.tl), spell:r=>r.has&&!/land/.test(r.tl),
+  commander:r=>r.has&&/legendary/.test(r.tl)&&/creature/.test(r.tl),
+  hybrid:r=>r.has&&r.mcs.includes('/')
+};
+function normMana(v){
+  v=unq(v).toUpperCase();
+  if(v.includes('{')) return v;
+  return (v.match(/\d+|[WUBRGCXSP]/g)||[]).map(x=>'{'+x+'}').join('');
+}
+
+function term(v, errors){
+  if(v[0]==='!' && v.length>1){ const ex=lc(unq(v.slice(1))); return r=>r.nm===ex; }
+  const km=v.match(/^([a-zA-Z_]+)(!=|<=|>=|:|=|<|>)([\s\S]*)$/);
+  if(!km){ return strPred(r=>r.nm,':',v) || (()=>true); }
+  const key=lc(km[1]), op=km[2], raw=km[3];
+  if(raw===''){ return ()=>true; }
+  let p=null, known=true;
+  switch(key){
+    case 'n': case 'name': p=strPred(r=>r.nm,op,raw); break;
+    case 't': case 'type': p=strPred(r=>r.tl,op,raw,{data:true}); break;
+    case 'o': case 'oracle': case 'fo': p=strPred(r=>r.ot,op,raw,{data:true,tilde:true}); break;
+    case 'ft': case 'flavor': p=strPred(r=>r.fl,op,raw,{data:true}); break;
+    case 'a': case 'artist': p=strPred(r=>r.art,op,raw,{data:true}); break;
+    case 'm': case 'mana': { const n=normMana(raw); p=r=>r.has&&r.mcs.includes(n); break; }
+    case 'kw': case 'keyword': p=listPred(r=>r.kw,op,raw); break;
+    case 'produces': p=listPred(r=>r.pm,op,raw); break;
+    case 'f': case 'format': case 'legal': case 'legality': {
+      const f=lc(unq(raw)).replace('edh','commander'); p=r=>r.has&&r.lg.includes(f); break; }
+    case 'c': case 'color': case 'colour': p=colorPred(r=>r.cols,op,raw,false); break;
+    case 'id': case 'identity': case 'ci': p=colorPred(r=>r.ci,op,raw,true); break;
+    case 'r': case 'rarity': {
+      const v2=lc(unq(raw)); const idx=RARITIES.findIndex(x=>x.startsWith(v2));
+      if(idx>=0) p=r=>cmpN(RARITIES.indexOf(r.rarity),op,idx); break; }
+    case 's': case 'set': case 'e': case 'edition': {
+      const v2=lc(unq(raw));
+      p=r=>{ const hit = lc(r.setCode)===v2 || (v2.length>3 && lc(r.setName).includes(v2)); return op==='!=' ? !hit : hit; }; break; }
+    case 'cn': case 'number': { const n=parseFloat(unq(raw)); p=r=>cmpN(r.num,op,n); break; }
+    case 'date': { const d=unq(raw); p=r=>{ if(!r.has) return false; const x=r.rd; switch(op){case ':':case '=':return x===d;case '!=':return x!==d;case '<':return x<d;case '>':return x>d;case '<=':return x<=d;case '>=':return x>=d;} return false; }; break; }
+    case 'is': {
+      const f=IS_FLAGS[lc(unq(raw))];
+      if(!f){ errors.push(`Unknown is:${unq(raw)}`); return ()=>true; }
+      p = op==='!=' ? r=>!f(r) : f; break; }
+    default:
+      if(NUM_FIELDS[key]){
+        const get=NUM_FIELDS[key], other=lc(unq(raw));
+        if(CROSS[key] && CROSS[other]){ const g2=NUM_FIELDS[other]; p=r=>cmpN(get(r),op,g2(r)); }
+        else { const n=parseFloat(unq(raw)); if(isNaN(n)){ errors.push(`“${raw}” isn't a number for ${key}:`); return ()=>true; } p=r=>cmpN(get(r),op,n); }
+      } else known=false;
+  }
+  if(!known){ errors.push(`Unknown filter “${km[1]}${op}”`); return ()=>true; }
+  if(!p){ errors.push(`Couldn't understand “${v}”`); return ()=>true; }
+  return p;
+}
+
+function compileQuery(str){
+  const errors=[];
+  try{
+    const toks=tokenize(str); let p=0;
+    const isOr = k => k && k.t==='w' && lc(k.v)==='or';
+    function orE(){
+      const n=[andE()];
+      while(isOr(toks[p])){ p++; n.push(andE()); }
+      return n.length>1 ? r=>n.some(f=>f(r)) : n[0];
+    }
+    function andE(){
+      const n=[];
+      while(p<toks.length){
+        const k=toks[p];
+        if(k.t===')'||isOr(k)) break;
+        if(k.t==='w' && lc(k.v)==='and'){ p++; continue; }
+        n.push(unary());
+      }
+      return r=>n.every(f=>f(r));
+    }
+    function unary(){
+      const k=toks[p];
+      if(k.t==='neg'){ p++; if(p>=toks.length) return ()=>true; const f=unary(); return r=>!f(r); }
+      if(k.t==='('){ p++; const f=orE(); if(toks[p]&&toks[p].t===')') p++; return f; }
+      p++;
+      if(k.v.length>1 && k.v[0]==='-'){ const f=term(k.v.slice(1),errors); return r=>!f(r); }
+      return term(k.v,errors);
+    }
+    const fs=[orE()];
+    while(p<toks.length){ p++; fs.push(orE()); }
+    return {fn:r=>fs.every(f=>f(r)), errors, blank:toks.length===0};
+  }catch(e){
+    return {fn:()=>true, errors:['Couldn\'t read that search'], blank:false};
+  }
+}
+
+const EXAMPLES = [
+  ['t:goblin','creature type or any word in the type line'],
+  ['t:"legendary creature"','a phrase in the type line'],
+  ['o:"draw a card"','rules text contains a phrase'],
+  ['o:"~ deals"','~ stands for the card\'s own name'],
+  ['c:r','red cards (c>=rg: at least red and green)'],
+  ['c:m','multicolor (c:c is colorless)'],
+  ['id<=wub','fits within a color identity'],
+  ['cmc<=2','mana value (also mv)'],
+  ['pow>=3 tou<=2','power and toughness (pow>tou works too)'],
+  ['m:{G}{G}','mana cost contains these symbols (m:2WW)'],
+  ['kw:flying','has a keyword ability'],
+  ['r:rare','rarity (r>=u, r:c)'],
+  ['s:dka','set code (or part of a set name)'],
+  ['is:foil','is:foil, nonfoil, multicolor, dfc, vanilla, dupe…'],
+  ['f:commander','legal in a format'],
+  ['cad>=1','price in CAD (usd>=1 for USD)'],
+  ['qty>=2','copies you own'],
+  ['a:"rebecca guay"','artist'],
+  ['ft:dragon','flavor text'],
+  ['year>=2020','release year'],
+  ['(t:vampire or t:zombie) -c:g','group, or, and exclude'],
+  ['!"Dark Withering"','exact card name']
+];
+$('examples').innerHTML = EXAMPLES.map(([q,d]) =>
+  `<div class="ex"><button type="button" data-q="${esc(q)}">${esc(q)}</button><span>${esc(d)}</span></div>`).join('');
+$('examples').addEventListener('click', e => {
+  const b=e.target.closest('button[data-q]'); if(!b) return;
+  $('q').value=b.dataset.q; render(); $('q').focus();
+});
+
+/* ---------------- table ---------------- */
 const cols = [
   {k:'name', label:'Card'},
-  {k:'setName', label:'Set'},
+  {k:'type', label:'Type'},
+  {k:'cost', label:'Cost'},
   {k:'foil', label:'Foil'},
   {k:'rarity', label:'Rarity'},
   {k:'qty', label:'Qty', cls:'r'},
@@ -109,16 +371,9 @@ const cols = [
 ];
 let sortKey='name', sortDir=1;
 
-const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const priceCad = r => (r.marketUsd != null ? r.marketUsd : r.paidUsd) * RATE;
-const money = n => n == null || isNaN(n) ? '–' : 'C$' + n.toFixed(2);
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-
 function artUrl(id){ return `https://cards.scryfall.io/normal/front/${id[0]}/${id[1]}/${id}.jpg`; }
 function artFallback(id){ return `https://api.scryfall.com/cards/${id}?format=image&version=normal`; }
 
-// header
 function renderHead(){
   $('head').innerHTML = cols.map(c =>
     `<th class="${c.cls||''}" data-k="${c.k}">${c.label} <span class="ar">${sortKey===c.k?(sortDir>0?'▲':'▼'):''}</span></th>`).join('');
@@ -130,50 +385,84 @@ $('head').addEventListener('click', e => {
   render();
 });
 
-// filters
-const uniq = a => [...new Set(a)];
-uniq(rows.map(r=>r.rarity)).sort((a,b)=>(RARITY_ORDER[a]??9)-(RARITY_ORDER[b]??9))
-  .forEach(r => $('fRarity').insertAdjacentHTML('beforeend', `<option value="${esc(r)}">${esc(cap(r))}</option>`));
-uniq(rows.map(r=>r.setName)).sort((a,b)=>a.localeCompare(b))
-  .forEach(s => $('fSet').insertAdjacentHTML('beforeend', `<option value="${esc(s)}">${esc(s)}</option>`));
-['q','fRarity','fFoil','fSet','pMin','pMax'].forEach(id => $(id).addEventListener('input', render));
-$('reset').onclick = () => { ['q','fRarity','fFoil','fSet','pMin','pMax'].forEach(id=>$(id).value=''); render(); };
-
-function filtered(){
-  const q = $('q').value.trim().toLowerCase(), ra=$('fRarity').value, fo=$('fFoil').value, se=$('fSet').value;
-  const mn = parseFloat($('pMin').value), mx = parseFloat($('pMax').value);
-  return rows.filter(r => {
-    if(q && !(r.name.toLowerCase().includes(q) || r.setName.toLowerCase().includes(q) || r.setCode.toLowerCase()===q)) return false;
-    if(ra && r.rarity!==ra) return false;
-    if(fo==='foil' && !r.foil) return false;
-    if(fo==='normal' && r.foil) return false;
-    if(se && r.setName!==se) return false;
-    const p = priceCad(r);
-    if(!isNaN(mn) && p<mn) return false;
-    if(!isNaN(mx) && p>mx) return false;
-    return true;
-  });
+const PIP_NAMES = {w:'White',u:'Blue',b:'Black',r:'Red',g:'Green'};
+const pipSpan = x => `<span class="pip pip-${x}">${x.toUpperCase()}</span>`;
+const MS = {};
+function closeMS(except){ document.querySelectorAll('.ms .msp').forEach(p => { if(!except || !except.contains(p)) p.hidden=true; }); }
+function makeMS(key, id, label, options, note){
+  const root=$(id), btn=root.querySelector('.msb'), panel=root.querySelector('.msp'), sel=new Set();
+  panel.innerHTML = options.map(o => `<label><input type="checkbox" value="${esc(o[0])}"><span>${o[2]||esc(o[1])}</span></label>`).join('')
+    + (note ? `<div class="msn">${esc(note)}</div>` : '') + '<button type="button" class="msc">Clear</button>';
+  function upd(){
+    const names=options.filter(o=>sel.has(o[0])).map(o=>o[1]);
+    btn.textContent = names.length ? label+': '+names.join(', ') : label;
+    btn.title = btn.textContent;
+    btn.classList.toggle('on', names.length>0);
+  }
+  panel.addEventListener('change', e => { const c=e.target; if(c.checked) sel.add(c.value); else sel.delete(c.value); upd(); render(); });
+  panel.querySelector('.msc').addEventListener('click', () => api.clear(true));
+  btn.addEventListener('click', e => { e.stopPropagation(); closeMS(root); panel.hidden=!panel.hidden; });
+  const api = { sel, clear(doRender){ sel.clear(); panel.querySelectorAll('input').forEach(i=>i.checked=false); upd(); if(doRender) render(); } };
+  MS[key]=api; return api;
 }
+makeMS('rarity','msRarity','Rarity',
+  uniq(rows.map(r=>r.rarity)).sort((a,b)=>RARITIES.indexOf(a)-RARITIES.indexOf(b)).map(r=>[r,cap(r)]));
+makeMS('foil','msFoil','Foil',[['foil','Foil'],['normal','Non-foil']]);
+makeMS('color','msColor','Color',
+  [...'wubrg'].map(x=>[x,PIP_NAMES[x],`<span class="pips">${pipSpan(x)}</span> ${PIP_NAMES[x]}`])
+    .concat([['c','Colorless'],['m','Multicolor']]),
+  'Shows cards that match any of the selected colors.');
+document.addEventListener('click', e => { if(!e.target.closest('.ms')) closeMS(); });
+addEventListener('keydown', e => { if(e.key==='Escape') closeMS(); });
+['q','pMin','pMax'].forEach(id => $(id).addEventListener('input', render));
+$('reset').onclick = () => { ['q','pMin','pMax'].forEach(id=>$(id).value=''); Object.values(MS).forEach(m=>m.clear(false)); render(); };
+
 function sortVal(r){
   switch(sortKey){
     case 'price': return priceCad(r);
-    case 'rarity': return RARITY_ORDER[r.rarity] ?? 9;
+    case 'rarity': return RARITIES.indexOf(r.rarity);
     case 'foil': return r.foil?1:0;
     case 'qty': return r.qty;
-    case 'setName': return r.setName.toLowerCase();
-    default: return r.name.toLowerCase();
+    case 'type': return lc(r.t||'~');
+    case 'cost': return r.has ? r.cmc : 99;
+    default: return r.nm;
   }
 }
+const symUrl = s => `https://svgs.scryfall.io/card-symbols/${s.replace(/[{}\/]/g,'')}.svg`;
+function costHtml(r){
+  if(!r.has || !r.mcs) return '<span class="dim">–</span>';
+  return '<span class="cost">' + r.mcs.split(' // ').map(part =>
+    (part.match(/\{[^}]+\}/g)||[]).map(s => `<img class="sym" src="${symUrl(s)}" alt="${esc(s)}" title="${esc(s)}" loading="lazy">`).join('')
+  ).join('<span class="sep">//</span>') + '</span>';
+}
 function render(){
-  const list = filtered().sort((a,b) => {
+  const Q=compileQuery($('q').value);
+  const ra=MS.rarity.sel, fo=MS.foil.sel, co=MS.color.sel;
+  const mn=parseFloat($('pMin').value), mx=parseFloat($('pMax').value);
+  const list = rows.filter(r => {
+    if(ra.size && !ra.has(r.rarity)) return false;
+    if(fo.size && !fo.has(r.foil?'foil':'normal')) return false;
+    if(co.size){
+      if(!r.has) return false;
+      const cs=r.cols;
+      let ok=false;
+      co.forEach(x => { if(x==='c' ? cs.length===0 : x==='m' ? cs.length>1 : cs.includes(x)) ok=true; });
+      if(!ok) return false;
+    }
+    const p=priceCad(r);
+    if(!isNaN(mn) && p<mn) return false;
+    if(!isNaN(mx) && p>mx) return false;
+    return Q.fn(r);
+  }).sort((a,b) => {
     const x=sortVal(a), y=sortVal(b);
     const c = x<y?-1:x>y?1:0;
     return (c || a.name.localeCompare(b.name)) * (c?sortDir:1);
   });
   renderHead();
-  $('body').innerHTML = list.map((r,i) => `<tr data-i="${r.id}">
+  $('body').innerHTML = list.map(r => `<tr>
     <td class="name" data-id="${r.id}" data-name="${esc(r.name)}">${esc(r.name)}</td>
-    <td class="set" title="${esc(r.setName)} #${r.num}">${esc(r.setName)} <span class="dim">· ${esc(r.setCode)} ${r.num}</span></td>
+    <td class="type">${r.t?esc(r.t):'<span class="dim">–</span>'}</td>
+    <td>${costHtml(r)}</td>
     <td>${r.foil?'<span class="foil">Foil</span>':'<span class="dim">–</span>'}</td>
     <td><span class="badge ${esc(r.rarity)}"><span class="dot"></span>${esc(cap(r.rarity))}</span></td>
     <td class="r">${r.qty}</td>
@@ -184,14 +473,21 @@ function render(){
   $('sCards').textContent = cards.toLocaleString();
   $('sUnique').textContent = list.length.toLocaleString();
   $('sValue').textContent = 'C$' + val.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const hint=$('hint');
+  if(Q.errors.length){ hint.className='err'; hint.textContent=uniq(Q.errors).join(' · '); }
+  else if(DATA_STATE==='loading' && (!Q.blank || MS.color.sel.size)){ hint.className=''; hint.textContent='Still loading card details from Scryfall — text, type and color searches will fill in shortly.'; }
+  else if(DATA_STATE==='done' && DATA_OK < rows.length*0.5){ hint.className='err'; hint.textContent='Couldn\'t load card details from Scryfall, so searches on type, rules text, color and similar won\'t work right now.'; }
+  else { hint.className=''; hint.textContent=''; }
+
   $('note').textContent =
     `Prices in CAD at 1 USD = ${RATE.toFixed(4)} CAD${RATE_LIVE?' (live rate)':' (approximate rate)'}. ` +
     (LIVE_PRICES ? 'Prices are current Scryfall market values.' :
      'Live Scryfall prices are unavailable right now, so prices shown are the original purchase prices.') +
-    ' Card images and prices from Scryfall.';
+    ' Card data and images from Scryfall.';
 }
 
-// preview
+/* ---------------- preview ---------------- */
 const pv=$('preview'), pimg=$('pimg'), ov=$('overlay'), oimg=$('oimg');
 function setImg(img,id){ img.onerror=()=>{ img.onerror=null; img.src=artFallback(id); }; img.src=artUrl(id); }
 function place(e){
@@ -203,10 +499,18 @@ function place(e){
 }
 const tb=$('body');
 tb.addEventListener('mouseover', e => {
-  if(e.pointerType==='touch') return;
   const td=e.target.closest('td.name'); if(!td) return;
   setImg(pimg, td.dataset.id); pimg.alt=td.dataset.name; pv.style.display='block'; place(e);
 });
+tb.addEventListener('error', e => {
+  const img=e.target;
+  if(!img || !img.classList || !img.classList.contains('sym')) return;
+  const txt=img.alt.replace(/[{}]/g,''), first=txt[0].toLowerCase();
+  const s=document.createElement('span');
+  s.className='pip pip-'+('wubrg'.includes(first) && txt.length===1 ? first : 'c');
+  s.textContent=txt.length>2 ? txt.replace('/','') : txt;
+  s.title=img.alt; img.replaceWith(s);
+}, true);
 tb.addEventListener('mousemove', e => { if(pv.style.display==='block') place(e); });
 tb.addEventListener('mouseout', e => { if(e.target.closest('td.name')) pv.style.display='none'; });
 tb.addEventListener('click', e => {
@@ -217,7 +521,7 @@ tb.addEventListener('click', e => {
 ov.addEventListener('click', ()=>ov.style.display='none');
 addEventListener('keydown', e => { if(e.key==='Escape') ov.style.display='none'; });
 
-// live rate + prices (best-effort; page works without them)
+/* ---------------- live data from Scryfall ---------------- */
 async function loadRate(){
   try{
     const r = await fetch('https://api.frankfurter.dev/v1/latest?base=USD&symbols=CAD');
@@ -225,12 +529,41 @@ async function loadRate(){
     if(j && j.rates && j.rates.CAD){ RATE=j.rates.CAD; RATE_LIVE=true; }
   }catch(e){}
 }
-async function loadPrices(){
+function compact(c){
+  const f=c.card_faces||[];
+  const j=k=> c[k]!=null ? c[k] : f.map(x=>x[k]).filter(x=>x!=null).join('\n');
+  const cols = c.colors || uniq(f.flatMap(x=>x.colors||[]));
+  const lg = c.legalities||{};
+  return {
+    p:c.prices, t:c.type_line||'', o:j('oracle_text'), c:cols, ci:c.color_identity||[], cmc:c.cmc,
+    mc: c.mana_cost ? c.mana_cost : f.map(x=>x.mana_cost).filter(Boolean).join(' // '),
+    pw: c.power ?? (f[0]&&f[0].power), tg: c.toughness ?? (f[0]&&f[0].toughness), ly: c.loyalty ?? (f[0]&&f[0].loyalty),
+    kw:c.keywords||[], a:c.artist||'', ft:j('flavor_text'), pm:c.produced_mana||[],
+    lg:Object.keys(lg).filter(k=>lg[k]==='legal'||lg[k]==='restricted'), rd:c.released_at||'', ly2:c.layout||''
+  };
+}
+function applyData(map){
+  let hits=0, ok=0;
+  rows.forEach(r => {
+    const d=map[r.id]; if(!d) return;
+    ok++; r.has=true;
+    r.t=d.t; r.tl=lc(d.t); r.ot=lc(d.o||''); r.cols=d.c.map(lc); r.ci=d.ci.map(lc);
+    r.cmc=d.cmc; r.pw=parseFloat(d.pw); r.tg=parseFloat(d.tg); r.loy=parseFloat(d.ly);
+    r.kw=d.kw.map(lc); r.art=lc(d.a); r.fl=lc(d.ft||''); r.pm=d.pm.map(lc); r.lg=d.lg;
+    r.rd=d.rd; r.year=parseInt(d.rd.slice(0,4)); r.mcs=(d.mc||'').toUpperCase(); r.layout=d.ly2;
+    const p=d.p||{};
+    const v = r.foil ? (p.usd_foil || p.usd_etched || p.usd) : (p.usd || p.usd_foil || p.usd_etched);
+    if(v){ r.marketUsd=parseFloat(v); hits++; }
+  });
+  DATA_OK=ok; LIVE_PRICES=hits>0;
+}
+async function loadData(){
   const ids = uniq(rows.map(r=>r.id));
+  const KEY='mtg-data-v2';
   const map = {};
   let cache = null;
-  try{ cache = JSON.parse(localStorage.getItem('mtg-prices-v1')||'null'); }catch(e){}
-  if(cache && Date.now()-cache.t < 6*3600*1000) Object.assign(map, cache.m);
+  try{ cache = JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
+  if(cache && Date.now()-cache.t < 6*3600*1000){ Object.assign(map, cache.m); }
   else {
     for(let i=0;i<ids.length;i+=75){
       try{
@@ -239,22 +572,21 @@ async function loadPrices(){
           body:JSON.stringify({identifiers:ids.slice(i,i+75).map(id=>({id}))})});
         if(!r.ok) continue;
         const j = await r.json();
-        (j.data||[]).forEach(c => { map[c.id] = c.prices; });
+        (j.data||[]).forEach(c => { map[c.id] = compact(c); });
       }catch(e){}
       await new Promise(res=>setTimeout(res,120));
     }
-    try{ if(Object.keys(map).length) localStorage.setItem('mtg-prices-v1', JSON.stringify({t:Date.now(), m:map})); }catch(e){}
+    if(Object.keys(map).length >= ids.length*0.95){
+      try{ localStorage.setItem(KEY, JSON.stringify({t:Date.now(), m:map})); }catch(e){}
+    } else if(cache){
+      for(const k in cache.m) if(!(k in map)) map[k]=cache.m[k];
+    }
   }
-  let hits=0;
-  rows.forEach(r => {
-    const p = map[r.id]; if(!p) return;
-    const v = r.foil ? (p.usd_foil || p.usd_etched || p.usd) : (p.usd || p.usd_foil || p.usd_etched);
-    if(v){ r.marketUsd = parseFloat(v); hits++; }
-  });
-  LIVE_PRICES = hits > 0;
+  applyData(map);
+  DATA_STATE='done';
 }
 render();
-(async()=>{ await Promise.all([loadRate(), loadPrices()]); render(); })();
+(async()=>{ await Promise.all([loadRate(), loadData()]); render(); })();
 </script>
 </body>
 </html>
