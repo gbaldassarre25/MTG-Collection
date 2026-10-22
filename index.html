@@ -59,6 +59,9 @@ td.type{color:var(--muted);font-size:13px;white-space:normal;min-width:140px}
 .msp input{width:16px;height:16px;padding:0;margin:0;accent-color:var(--accent)}
 .msn{font-size:12px;color:var(--muted);padding:4px 8px;white-space:normal;max-width:210px}
 .msc{width:100%;margin-top:4px;font-size:13px}
+.msh{border:0;border-top:1px solid var(--line);margin:4px 0}
+.msp label.exact span{white-space:normal;max-width:200px}
+.msp label.off{opacity:.45;cursor:not-allowed}
 .cost{display:inline-flex;align-items:center;gap:1px;white-space:nowrap;vertical-align:middle}
 .sym{width:17px;height:17px;display:block;flex:none}
 .cost .sep{margin:0 4px;color:var(--muted);font-size:12px}
@@ -98,6 +101,7 @@ td.type{color:var(--muted);font-size:13px;white-space:normal;min-width:140px}
   <div class="ms" id="msRarity"><button type="button" class="msb">Rarity</button><div class="msp" hidden></div></div>
   <div class="ms" id="msFoil"><button type="button" class="msb">Foil</button><div class="msp" hidden></div></div>
   <div class="ms" id="msColor"><button type="button" class="msb">Color</button><div class="msp" hidden></div></div>
+  <div class="ms" id="msIdentity"><button type="button" class="msb">Commander identity</button><div class="msp" hidden></div></div>
   <input id="pMin" class="num" type="number" min="0" step="0.01" placeholder="Min $" aria-label="Minimum price">
   <input id="pMax" class="num" type="number" min="0" step="0.01" placeholder="Max $" aria-label="Maximum price">
   <button id="reset" type="button">Reset</button>
@@ -389,29 +393,48 @@ const PIP_NAMES = {w:'White',u:'Blue',b:'Black',r:'Red',g:'Green'};
 const pipSpan = x => `<span class="pip pip-${x}">${x.toUpperCase()}</span>`;
 const MS = {};
 function closeMS(except){ document.querySelectorAll('.ms .msp').forEach(p => { if(!except || !except.contains(p)) p.hidden=true; }); }
-function makeMS(key, id, label, options, note){
+function makeMS(key, id, label, options, note, extra){
   const root=$(id), btn=root.querySelector('.msb'), panel=root.querySelector('.msp'), sel=new Set();
-  panel.innerHTML = options.map(o => `<label><input type="checkbox" value="${esc(o[0])}"><span>${o[2]||esc(o[1])}</span></label>`).join('')
+  panel.innerHTML = options.map(o => `<label><input type="checkbox" data-opt value="${esc(o[0])}"><span>${o[2]||esc(o[1])}</span></label>`).join('')
     + (note ? `<div class="msn">${esc(note)}</div>` : '') + '<button type="button" class="msc">Clear</button>';
   function upd(){
     const names=options.filter(o=>sel.has(o[0])).map(o=>o[1]);
-    btn.textContent = names.length ? label+': '+names.join(', ') : label;
+    btn.textContent = names.length ? label+': '+names.join(', ')+(extra ? extra() : '') : label;
     btn.title = btn.textContent;
     btn.classList.toggle('on', names.length>0);
   }
-  panel.addEventListener('change', e => { const c=e.target; if(c.checked) sel.add(c.value); else sel.delete(c.value); upd(); render(); });
+  panel.addEventListener('change', e => { const c=e.target; if(!c.hasAttribute('data-opt')) return; if(c.checked) sel.add(c.value); else sel.delete(c.value); upd(); render(); });
   panel.querySelector('.msc').addEventListener('click', () => api.clear(true));
   btn.addEventListener('click', e => { e.stopPropagation(); closeMS(root); panel.hidden=!panel.hidden; });
-  const api = { sel, clear(doRender){ sel.clear(); panel.querySelectorAll('input').forEach(i=>i.checked=false); upd(); if(doRender) render(); } };
+  const api = { sel, upd, onClear:null, clear(doRender){ sel.clear(); panel.querySelectorAll('input[data-opt]').forEach(i=>i.checked=false); if(api.onClear) api.onClear(); upd(); if(doRender) render(); } };
   MS[key]=api; return api;
 }
 makeMS('rarity','msRarity','Rarity',
   uniq(rows.map(r=>r.rarity)).sort((a,b)=>RARITIES.indexOf(a)-RARITIES.indexOf(b)).map(r=>[r,cap(r)]));
 makeMS('foil','msFoil','Foil',[['foil','Foil'],['normal','Non-foil']]);
+let EXACT_COLOR = false;
 makeMS('color','msColor','Color',
   [...'wubrg'].map(x=>[x,PIP_NAMES[x],`<span class="pips">${pipSpan(x)}</span> ${PIP_NAMES[x]}`])
     .concat([['c','Colorless'],['m','Multicolor']]),
-  'Shows cards that match any of the selected colors.');
+  'By default, shows cards that include any selected color. Exact match shows only cards whose colors are exactly the selected ones.',
+  () => EXACT_COLOR ? ' (exact)' : '');
+(function(){
+  const panel=$('msColor').querySelector('.msp');
+  panel.insertAdjacentHTML('afterbegin','<label class="exact"><input type="checkbox" id="exactColor"><span><b>Exact match</b> <span class="dim">(only the selected colors, together)</span></span></label><hr class="msh">');
+  const ex=$('exactColor'), mBox=panel.querySelector('input[value="m"]'), mLabel=mBox.closest('label');
+  function sync(){
+    EXACT_COLOR=ex.checked;
+    if(EXACT_COLOR && MS.color.sel.has('m')){ MS.color.sel.delete('m'); mBox.checked=false; }
+    mBox.disabled=EXACT_COLOR; mLabel.classList.toggle('off',EXACT_COLOR);
+    MS.color.upd();
+  }
+  ex.addEventListener('change', () => { sync(); render(); });
+  MS.color.onClear = () => { ex.checked=false; sync(); };
+})();
+makeMS('identity','msIdentity','Identity',
+  [...'wubrg'].map(x=>[x,PIP_NAMES[x],`<span class="pips">${pipSpan(x)}</span> ${PIP_NAMES[x]}`])
+    .concat([['c','Colorless']]),
+  'For Commander deck building: pick your commander\'s colors to see every card whose color identity fits within them, including colorless cards. Pick only Colorless for a colorless commander.');
 document.addEventListener('click', e => { if(!e.target.closest('.ms')) closeMS(); });
 addEventListener('keydown', e => { if(e.key==='Escape') closeMS(); });
 ['q','pMin','pMax'].forEach(id => $(id).addEventListener('input', render));
@@ -437,17 +460,27 @@ function costHtml(r){
 }
 function render(){
   const Q=compileQuery($('q').value);
-  const ra=MS.rarity.sel, fo=MS.foil.sel, co=MS.color.sel;
+  const ra=MS.rarity.sel, fo=MS.foil.sel, co=MS.color.sel, idn=MS.identity.sel;
   const mn=parseFloat($('pMin').value), mx=parseFloat($('pMax').value);
   const list = rows.filter(r => {
     if(ra.size && !ra.has(r.rarity)) return false;
     if(fo.size && !fo.has(r.foil?'foil':'normal')) return false;
+    if(idn.size){
+      if(!r.has) return false;
+      if(!r.ci.every(x => idn.has(x))) return false;
+    }
     if(co.size){
       if(!r.has) return false;
       const cs=r.cols;
-      let ok=false;
-      co.forEach(x => { if(x==='c' ? cs.length===0 : x==='m' ? cs.length>1 : cs.includes(x)) ok=true; });
-      if(!ok) return false;
+      if(EXACT_COLOR){
+        const L=[...'wubrg'].filter(x=>co.has(x));
+        if(L.length){ if(cs.length!==L.length || !L.every(x=>cs.includes(x))) return false; }
+        else if(co.has('c') && cs.length!==0) return false;
+      } else {
+        let ok=false;
+        co.forEach(x => { if(x==='c' ? cs.length===0 : x==='m' ? cs.length>1 : cs.includes(x)) ok=true; });
+        if(!ok) return false;
+      }
     }
     const p=priceCad(r);
     if(!isNaN(mn) && p<mn) return false;
@@ -476,7 +509,7 @@ function render(){
 
   const hint=$('hint');
   if(Q.errors.length){ hint.className='err'; hint.textContent=uniq(Q.errors).join(' · '); }
-  else if(DATA_STATE==='loading' && (!Q.blank || MS.color.sel.size)){ hint.className=''; hint.textContent='Still loading card details from Scryfall — text, type and color searches will fill in shortly.'; }
+  else if(DATA_STATE==='loading' && (!Q.blank || MS.color.sel.size || MS.identity.sel.size)){ hint.className=''; hint.textContent='Still loading card details from Scryfall — text, type and color searches will fill in shortly.'; }
   else if(DATA_STATE==='done' && DATA_OK < rows.length*0.5){ hint.className='err'; hint.textContent='Couldn\'t load card details from Scryfall, so searches on type, rules text, color and similar won\'t work right now.'; }
   else { hint.className=''; hint.textContent=''; }
 
