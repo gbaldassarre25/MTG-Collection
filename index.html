@@ -137,6 +137,10 @@ th:first-child{z-index:3}
 #note{margin:6px 2px 0}
 @media (max-width:700px) and (orientation:portrait){td:first-child{z-index:1}}
 @media (max-height:500px){header{padding:6px 0 2px;gap:6px}h1{font-size:19px}.stats{gap:12px}.stat b{font-size:15px}.stat span{font-size:10px}.controls{margin:2px 0 0;padding:4px 0}details.help{margin:2px 0 4px}#note{display:none}body{padding-bottom:6px}}
+table.measure{table-layout:auto!important;width:auto!important;min-width:0!important}
+.measure th,.measure td{width:auto!important;overflow:visible!important;text-overflow:clip!important}
+@media (min-width:1001px){table.locked{table-layout:fixed;min-width:var(--tw)}table.locked th:nth-child(1){width:var(--w1)}table.locked th:nth-child(2){width:var(--w2)}table.locked th:nth-child(3){width:var(--w3)}table.locked th:nth-child(4){width:var(--w4)}table.locked th:nth-child(5){width:var(--w5)}table.locked th:nth-child(6){width:var(--w6)}table.locked th:nth-child(7){width:var(--w7)}table.locked th:nth-child(8){width:var(--w8)}table.locked th:nth-child(9){width:var(--w9)}}
+@media (max-width:700px) and (orientation:portrait){table.locked{table-layout:fixed;min-width:var(--tw)}table.locked th:nth-child(1){width:var(--w1)}table.locked th:nth-child(2){width:var(--w2)}table.locked th:nth-child(3){width:var(--w3)}table.locked th:nth-child(4){width:var(--w4)}table.locked th:nth-child(5){width:var(--w5)}table.locked th:nth-child(6){width:var(--w6)}table.locked th:nth-child(7){width:var(--w7)}table.locked th:nth-child(8){width:var(--w8)}table.locked th:nth-child(9){width:var(--w9)}}
 </style>
 </head>
 <body>
@@ -542,6 +546,31 @@ function costHtml(r){
     (part.match(/\{[^}]+\}/g)||[]).map(s => `<img class="sym" src="${symUrl(s)}" alt="${esc(s)}" title="${esc(s)}" loading="lazy">`).join('')
   ).join('<span class="sep">//</span>') + '</span>';
 }
+function rowHtml(r){ return `<tr>
+    <td class="name" data-id="${r.id}" data-name="${esc(r.name)}" data-dfc="${isDfc(r)?1:0}">${esc(r.name)}</td>
+    <td class="type">${r.t?esc(r.t):'<span class="dim">–</span>'}</td>
+    <td>${costHtml(r)}</td>
+    <td class="set" title="${esc(r.setName)} #${r.num}">${esc(r.setName)} <span class="dim">· ${esc(r.setCode)} ${r.num}</span></td>
+    <td class="year">${r.has && !isNaN(r.year) ? r.year : '<span class="dim">–</span>'}</td>
+    <td>${r.foil?'<span class="foil">Foil</span>':'<span class="dim">–</span>'}</td>
+    <td><span class="badge ${esc(r.rarity)}"><span class="dot"></span>${esc(cap(r.rarity))}</span></td>
+    <td class="r">${r.qty}</td>
+    <td class="r">${money(priceCad(r))}</td></tr>`; }
+let lockW = 0;
+function lockColumns(){
+  const tbl = document.querySelector('table');
+  const box = document.createElement('div');
+  box.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;pointer-events:none';
+  box.innerHTML = '<table class="measure"><thead><tr>' + $('head').innerHTML + '</tr></thead><tbody>' + rows.map(rowHtml).join('') + '</tbody></table>';
+  document.body.appendChild(box);
+  const w = [...box.querySelectorAll('th')].map(th => Math.ceil(th.getBoundingClientRect().width));
+  box.remove();
+  w.forEach((x,i) => tbl.style.setProperty('--w'+(i+1), x+'px'));
+  tbl.style.setProperty('--tw', w.reduce((a,b)=>a+b,0)+'px');
+  tbl.classList.add('locked'); lockW = innerWidth;
+}
+let lockT = 0;
+addEventListener('resize', () => { if(!lockW || innerWidth===lockW) return; clearTimeout(lockT); lockT = setTimeout(lockColumns, 250); });
 function render(){
   const Q=compileQuery($('q').value);
   const ra=MS.rarity.sel, se=MS.set.sel, co=MS.color.sel, idn=MS.identity.sel;
@@ -583,16 +612,7 @@ function render(){
     return (c || a.name.localeCompare(b.name)) * (c?sortDir:1);
   });
   renderHead();
-  $('body').innerHTML = list.map(r => `<tr>
-    <td class="name" data-id="${r.id}" data-name="${esc(r.name)}" data-dfc="${isDfc(r)?1:0}">${esc(r.name)}</td>
-    <td class="type">${r.t?esc(r.t):'<span class="dim">–</span>'}</td>
-    <td>${costHtml(r)}</td>
-    <td class="set" title="${esc(r.setName)} #${r.num}">${esc(r.setName)} <span class="dim">· ${esc(r.setCode)} ${r.num}</span></td>
-    <td class="year">${r.has && !isNaN(r.year) ? r.year : '<span class="dim">–</span>'}</td>
-    <td>${r.foil?'<span class="foil">Foil</span>':'<span class="dim">–</span>'}</td>
-    <td><span class="badge ${esc(r.rarity)}"><span class="dot"></span>${esc(cap(r.rarity))}</span></td>
-    <td class="r">${r.qty}</td>
-    <td class="r">${money(priceCad(r))}</td></tr>`).join('');
+  $('body').innerHTML = list.map(rowHtml).join('');
   $('empty').hidden = list.length>0;
   const cards = list.reduce((s,r)=>s+r.qty,0);
   const val = list.reduce((s,r)=>s+(priceCad(r)||0)*r.qty,0);
@@ -774,7 +794,7 @@ async function loadDataOld(){
   DATA_STATE='done';
 }
 render();
-(async()=>{ await Promise.all([loadRate(), loadData()]); render(); })();
+(async()=>{ await Promise.all([loadRate(), loadData()]); render(); lockColumns(); })();
 </script>
 </body>
 </html>
