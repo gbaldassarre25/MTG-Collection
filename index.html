@@ -51,7 +51,6 @@ th.asc .srt .u,th.desc .srt .d{opacity:1;color:var(--accent)}
 th:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .yrs{display:flex;align-items:center;gap:6px;padding:0 2px}
 .yl{font-size:14px;color:var(--muted)}
-.ydash{color:var(--muted)}
 .yr{width:84px}
 th.r,td.r{text-align:right}
 tbody tr:hover{background:var(--hover)}
@@ -82,6 +81,7 @@ td.year{color:var(--muted);font-size:13px;white-space:nowrap}
 .sym{width:17px;height:17px;display:block;flex:none}
 .cost .sep{margin:0 4px;color:var(--muted);font-size:12px}
 .pips{display:inline-flex;gap:3px;vertical-align:middle}
+.pips .sym{width:20px;height:20px}
 .pip{width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 10px/1 system-ui,sans-serif;color:#1a1a1a;border:1px solid rgba(0,0,0,.4)}
 .pip-w{background:#f8f3d8}.pip-u{background:#8cc8ef}.pip-b{background:#6e625d;color:#fff}.pip-r{background:#ee8a6c}.pip-g{background:#7fbf8a}.pip-c{background:#cfcfcf}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:13px}
@@ -127,7 +127,6 @@ td.year{color:var(--muted);font-size:13px;white-space:nowrap}
   <div class="yrs">
     <span class="yl">Year</span>
     <input id="yMin" class="yr" type="number" min="1993" max="2100" step="1" placeholder="From" aria-label="Released from year">
-    <span class="ydash">–</span>
     <input id="yMax" class="yr" type="number" min="1993" max="2100" step="1" placeholder="To" aria-label="Released up to year">
   </div>
   <button id="reset" type="button">Reset</button>
@@ -424,7 +423,7 @@ $('head').addEventListener('keydown', e => {
 });
 
 const PIP_NAMES = {w:'White',u:'Blue',b:'Black',r:'Red',g:'Green'};
-const pipSpan = x => `<span class="pip pip-${x}">${x.toUpperCase()}</span>`;
+const pipSpan = x => `<img class="sym" src="https://svgs.scryfall.io/card-symbols/${x.toUpperCase()}.svg" alt="${x.toUpperCase()}" onerror="this.outerHTML='<span class=&quot;pip pip-${x}&quot;>${x.toUpperCase()}</span>'">`;
 const MS = {};
 function closeMS(except){ document.querySelectorAll('.ms .msp').forEach(p => { if(!except || !except.contains(p)) p.hidden=true; }); }
 function makeMS(key, id, label, options, note, extra, searchable){
