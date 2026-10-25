@@ -557,6 +557,7 @@ function render(){
   if(Q.errors.length){ hint.className='err'; hint.textContent=uniq(Q.errors).join(' · '); }
   else if(DATA_STATE==='loading' && (!Q.blank || MS.color.sel.size || MS.identity.sel.size || $('yMin').value || $('yMax').value)){ hint.className=''; hint.textContent='Still loading card details from Scryfall — text, type and color searches will fill in shortly.'; }
   else if(DATA_STATE==='done' && DATA_OK < rows.length*0.5){ hint.className='err'; hint.textContent='Couldn\'t load card details from Scryfall, so searches on type, rules text, color and similar won\'t work right now.'; }
+  else if(DATA_STATE==='done' && DATA_OK < rows.length){ hint.className='err'; hint.textContent=(rows.length-DATA_OK)+' card'+(rows.length-DATA_OK===1?'':'s')+' couldn\'t be found on Scryfall and will show dashes for type, cost and year.'; }
   else { hint.className=''; hint.textContent=''; }
 
   $('note').textContent =
@@ -643,6 +644,61 @@ function applyData(map){
   DATA_OK=ok; LIVE_PRICES=hits>0;
 }
 async function loadData(){
+  const ids = uniq(rows.map(r=>r.id));
+  const KEY='mtg-data-v3', FRESH=6*3600*1000;
+  const map = {};
+  let cacheT = 0;
+  try{ const c=JSON.parse(localStorage.getItem(KEY)||'null'); if(c && c.m){ Object.assign(map, c.m); cacheT=c.t||0; } }catch(e){}
+  const stale = Date.now()-cacheT > FRESH;
+  const sleep = ms => new Promise(res=>setTimeout(res,ms));
+  async function post(identifiers){
+    for(let a=0;a<4;a++){
+      try{
+        const r = await fetch('https://api.scryfall.com/cards/collection',{
+          method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body:JSON.stringify({identifiers})});
+        if(r.ok) return await r.json();
+        if(r.status!==429 && r.status<500) return null;
+      }catch(e){}
+      await sleep(700*(a+1));
+    }
+    return null;
+  }
+  const bySetNum = {};
+  rows.forEach(r => { (bySetNum[lc(r.setCode)+'/'+lc(r.num)] = bySetNum[lc(r.setCode)+'/'+lc(r.num)] || []).push(r); });
+  let todo = stale ? ids : ids.filter(id => !map[id]);
+  for(let pass=0; pass<3 && todo.length; pass++){
+    if(pass) await sleep(1500);
+    const retry = [], lost = [];
+    for(let i=0;i<todo.length;i+=75){
+      const chunk = todo.slice(i,i+75);
+      const j = await post(chunk.map(id=>({id})));
+      if(!j) retry.push(...chunk);
+      else {
+        (j.data||[]).forEach(c => { map[c.id] = compact(c); });
+        (j.not_found||[]).forEach(n => { if(n.id) lost.push(n.id); });
+      }
+      await sleep(120);
+    }
+    // ids Scryfall didn't recognise: look them up by set + collector number instead
+    const fb = uniq(lost.filter(id=>!map[id]).map(id=>rows.find(r=>r.id===id)).filter(Boolean).map(r=>lc(r.setCode)+'/'+lc(r.num)));
+    for(let i=0;i<fb.length;i+=75){
+      const j = await post(fb.slice(i,i+75).map(k=>({set:k.split('/')[0], collector_number:k.split('/').slice(1).join('/')})));
+      if(j) (j.data||[]).forEach(c => {
+        const d=compact(c);
+        (bySetNum[lc(c.set)+'/'+lc(c.collector_number)]||[]).forEach(r => { map[r.id]=d; });
+      });
+      await sleep(120);
+    }
+    todo = uniq(retry.concat(lost.filter(id=>!map[id])));
+    if(!retry.length) break;
+  }
+  const missing = ids.filter(id=>!map[id]).length;
+  try{ localStorage.setItem(KEY, JSON.stringify({t: missing||!stale ? cacheT : Date.now(), m:map})); }catch(e){}
+  applyData(map);
+  DATA_STATE='done';
+}
+async function loadDataOld(){
   const ids = uniq(rows.map(r=>r.id));
   const KEY='mtg-data-v2';
   const map = {};
