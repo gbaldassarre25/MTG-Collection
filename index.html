@@ -209,6 +209,9 @@ table.locked th,table.locked td{overflow:visible}
 }
 .wrap{width:var(--bw,100%);max-width:min(100%,1700px);margin:0 auto}
 .tablebox{width:100%}
+tr.sp{pointer-events:none}
+tr.sp td,tbody tr.sp:hover td{padding:0!important;border:0!important;position:static!important;background:none!important;box-shadow:none!important}
+tbody tr.sp:hover{background:none}
 </style>
 </head>
 <body>
@@ -706,25 +709,37 @@ function mkRows(rs){
   need.forEach((r,i) => { r._tr = els[i]; });
 }
 let lastList = [];
+// Only the rows around what is on screen are in the page (plus spacer rows that keep the scrollbar the right
+// length). With thousands of cards this keeps typing, filtering and scrolling quick on a phone.
+const VL = { a:-1, b:-1, rh:0 };
 function paintRows(list){
-  // each card keeps its own <tr>; filtering/sorting just re-attaches them. The first rows appear at once and
-  // the rest follow in small chunks, so the page stays responsive with thousands of cards.
-  const body = $('body'), N1 = 100, N = 250;
   if(KEEP_SCROLL){
     list.forEach(r => { if(r._tr) r._tr.cells[8].textContent = money(priceSel(r)); });
     if(list.length === lastList.length && list.every((r,k) => r === lastList[k])) return;   // same rows, same order: keep what is on screen
-    cancelAnimationFrame(paintT);
-    lastList = list; mkRows(list); body.replaceChildren(...list.map(r => r._tr)); return;
   }
-  cancelAnimationFrame(paintT);
   lastList = list;
-  const first = list.slice(0,N1); mkRows(first); body.replaceChildren(...first.map(r => r._tr));
-  let i = N1;
-  (function more(){
-    if(i >= list.length) return;
-    const part = list.slice(i, i+N); mkRows(part); body.append(...part.map(r => r._tr));
-    i += N; paintT = requestAnimationFrame(more);
-  })();
+  VL.a = VL.b = -1;
+  renderWindow(true);
+}
+function spacerRow(h){
+  const tr = document.createElement('tr'), td = document.createElement('td');
+  tr.className = 'sp'; td.colSpan = 9; td.style.height = h + 'px'; tr.appendChild(td);
+  return tr;
+}
+function renderWindow(force){
+  const body = $('body'), box = document.querySelector('.tablebox'), list = lastList, n = list.length, BUF = 30;
+  if(!n){ body.replaceChildren(); VL.a = VL.b = -1; return; }
+  if(!VL.rh){                                   // measure one real row (every row has the same height)
+    const m = list.slice(0, Math.min(n, 20)); mkRows(m); body.replaceChildren(...m.map(r => r._tr));
+    VL.rh = m[0]._tr.getBoundingClientRect().height || 40; VL.a = VL.b = -1;
+  }
+  const rh = VL.rh, th = box.querySelector('thead'), thH = th ? th.offsetHeight : 0;
+  const fv = Math.max(0, Math.floor((box.scrollTop - thH) / rh)), lv = fv + Math.ceil(box.clientHeight / rh);
+  if(!force && VL.a >= 0 && (VL.a === 0 || fv >= VL.a + BUF/2) && (VL.b === n || lv <= VL.b - BUF/2)) return;
+  const a = Math.max(0, fv - BUF), b = Math.min(n, lv + BUF), part = list.slice(a, b);
+  mkRows(part);
+  body.replaceChildren(spacerRow(a*rh), ...part.map(r => r._tr), spacerRow((n-b)*rh));
+  VL.a = a; VL.b = b;
 }
 function readYears(){ Y1=parseInt($('yMin').value); Y2=parseInt($('yMax').value); }
 function failMask(r, Q){
@@ -1070,6 +1085,12 @@ syncCur();
     } else if(t<=2) b.classList.remove('scrolled');
   }, {passive:true});
 })();
+{
+  const boxEl = document.querySelector('.tablebox'); let vT = 0;
+  boxEl.addEventListener('scroll', () => { if(vT) return; vT = requestAnimationFrame(() => { vT = 0; renderWindow(false); }); }, {passive:true});
+  new ResizeObserver(() => renderWindow(false)).observe(boxEl);
+  addEventListener('resize', () => { VL.rh = 0; renderWindow(true); });
+}
 earlyLock();
 (async()=>{
   // saved card data (from an earlier visit) shows immediately; fresh data is fetched behind the scenes
